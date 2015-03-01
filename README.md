@@ -1,5 +1,6 @@
-# tp-igp-pop3-server
-Réalisation d'un server POP3 simplifé pour l'UE d'ingénierie des protocoles.
+# tp-igp-pop3
+Réalisation d'un client et d'un server POP3 simplifé pour l'UE d'ingénierie des protocoles.
+
 
 #Todo
 
