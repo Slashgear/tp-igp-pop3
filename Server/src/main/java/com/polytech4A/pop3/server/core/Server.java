@@ -16,13 +16,15 @@ import java.net.ServerSocket;
 public class Server {
 
     /**
+     * Logger of the server.
+     */
+    //TODO : Develop a local logger in file. And then in html page.
+    private static Logger logger = Logger.getLogger(Server.class);
+
+    /**
      * Server's socket.
      */
     private ServerSocket socket;
-    /**
-     * Logger of the server.
-     */
-    private static Logger logger = Logger.getLogger(Server.class);
 
     /**
      * Getter of server's socket.
