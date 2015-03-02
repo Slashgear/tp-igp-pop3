@@ -1,5 +1,7 @@
 package com.polytech4A.pop3.messages;
 
+import com.polytech4A.pop3.messages.Exceptions.MalFormedMessageException;
+
 import java.util.regex.Pattern;
 
 /**
@@ -58,8 +60,9 @@ public class OkApopMessage extends OkMessage {
      * Constructor who create a Ok for APOP message and who parse informations in the text.
      *
      * @param text OkApopMessage
+     * @throws com.polytech4A.pop3.messages.Exceptions.MalFormedMessageException
      */
-    public OkApopMessage(String text) {
+    public OkApopMessage(String text) throws MalFormedMessageException {
         super();
         if (OkApopMessage.matches(text)) {
             this.id = text.split(" ")[1].split("'")[0];
@@ -68,6 +71,8 @@ public class OkApopMessage extends OkMessage {
             String messageSize = text.split("\\(")[1].split(" octets\\)")[0];
             this.messageSize = Integer.parseInt(messageSize);
             construct();
+        } else {
+            throw new MalFormedMessageException("Ok for Apop Message  Malformed : Expected ^\\+OK \\S*'s maildrop has \\d* messages \\(\\d* octets\\)$");
         }
     }
 

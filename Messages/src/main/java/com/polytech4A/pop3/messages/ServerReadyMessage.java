@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
  * Created by Antoine on 01/03/15.
  *
  * @author Antoine
- * @version 1.0
+ * @version 1.1
  *          <p/>
  *          Server ready message for POP3 exchange.
  */
@@ -33,21 +33,27 @@ public class ServerReadyMessage extends OkMessage {
      */
     public ServerReadyMessage(String text) {
         super();
+        String[] array;
         if (ServerReadyMessage.matches(text)) {
-            String[] array = text.split(" ");
-            this.serverName = array[1];
+             array= text.split(" ");
+            this.serverName =array[1];
+            construct(text.substring(text.indexOf(serverName + " ") + serverName.length()));
         } else {
-            this.serverName = text;
+            array= text.split(" ");
+            this.serverName = array[0];
+            construct(text.substring(text.indexOf(" ")));
+
         }
-        construct();
     }
 
     /**
      * Procedure for the construction of the ServerReadyMessage.
+     * @param text
      */
-    private void construct() {
+    private void construct(String text) {
         this.message.append(" ");
         this.message.append(serverName);
+        this.message.append(text);
     }
 
     /**
@@ -57,7 +63,7 @@ public class ServerReadyMessage extends OkMessage {
      * @return true/false.
      */
     public static boolean matches(String text) {
-        String regex = "^\\+OK .*$";
+        String regex = "^\\+OK \\S* .*$";
         return Pattern.matches(regex, text);
     }
 }

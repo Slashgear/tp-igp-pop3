@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
  * Created by Antoine on 01/03/15.
  *
  * @author Antoine
- * @version 1.0
+ * @version 1.1
  *          <p/>
  *          Error Message for POP3 exchange.
  */
@@ -34,8 +34,7 @@ public class ErrMessage extends Message {
     public ErrMessage(String text) {
         super();
         if (ErrMessage.matches(text)) {
-            String[] array = text.split(" ");
-            this.errorMessage = array[1];
+            this.errorMessage = text.substring(text.indexOf(" ") + 1);
         } else {
             this.errorMessage = text;
         }
