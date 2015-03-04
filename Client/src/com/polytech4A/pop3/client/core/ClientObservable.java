@@ -5,11 +5,16 @@ import java.util.Observable;
 /**
  * Main class for the client
  */
-public class Client extends Observable implements Runnable {
+public class ClientObservable extends Observable implements Runnable {
     private ClientConnection connection;
 
-    public Client() {
+    public ClientObservable() {
         this.connection = new ClientConnection();
+    }
+
+    private void updateObservers() {
+        setChanged();
+        notifyObservers();
     }
 
     @Override

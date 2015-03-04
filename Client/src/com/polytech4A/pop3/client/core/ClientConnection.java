@@ -9,42 +9,18 @@ import java.net.Socket;
  */
 public class ClientConnection{
     private Socket socket;
-    private int port;
-    private InetAddress address;
-    private InputStream inputStream;
-    private OutputStream outputStream;
     private BufferedOutputStream bufferedOutputStream;
     private BufferedInputStream bufferedInputStream;
 
     public ClientConnection(){
     }
 
+    public ClientConnection(InetAddress address, int port){
+        this.createConnection(address, port);
+    }
+
     public Socket getSocket() {
         return socket;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int _port) {
-        this.port = _port;
-    }
-
-    public InetAddress getAddress() {
-        return address;
-    }
-
-    public void setAddress(InetAddress _address) {
-        this.address = _address;
-    }
-
-    public InputStream getInputStream() {
-        return inputStream;
-    }
-
-    public OutputStream getOutputStream() {
-        return outputStream;
     }
 
     public BufferedOutputStream getBufferedOutputStream() {
@@ -61,17 +37,14 @@ public class ClientConnection{
      * @param port      Port of the server to reach
      * @param address   IP Adress of the server to reach
      */
-    public void createConnection(InetAddress address, int port) {
+    private void createConnection(InetAddress address, int port) {
         try {
-            this.address = address;
-            this.port = port;
-
             this.socket = new Socket(address, port);
-            this.inputStream = this.getSocket().getInputStream();
-            this.outputStream = this.getSocket().getOutputStream();
+            InputStream inputStream = this.getSocket().getInputStream();
+            OutputStream outputStream = this.getSocket().getOutputStream();
 
-            this.bufferedOutputStream = new BufferedOutputStream(socket.getOutputStream());
-            this.bufferedInputStream = new BufferedInputStream(socket.getInputStream());
+            this.bufferedOutputStream = new BufferedOutputStream(outputStream);
+            this.bufferedInputStream = new BufferedInputStream(inputStream);
 
         } catch (IOException e) {
             e.printStackTrace();
