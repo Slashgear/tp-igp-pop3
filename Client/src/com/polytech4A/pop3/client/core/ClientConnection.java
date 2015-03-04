@@ -50,4 +50,15 @@ public class ClientConnection{
             e.printStackTrace();
         }
     }
+
+    /**
+     * Will close the connection with the server by closing the socket
+     */
+    public void closeConnection(){
+        try {
+            this.socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    };
 }

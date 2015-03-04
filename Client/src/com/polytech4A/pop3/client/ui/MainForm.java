@@ -1,6 +1,6 @@
 package com.polytech4A.pop3.client.ui;
 
-import com.polytech4A.pop3.client.core.ClientObservable;
+import com.polytech4A.pop3.client.core.Client;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
@@ -11,18 +11,18 @@ import java.util.Observer;
 /**
  * Class for the main window of the client application
  */
-public class MainForm implements Observer {
+public class MainForm extends javax.swing.JFrame implements Observer {
     private JPanel panel1;
     private JTextField AddressTextInput;
     private JTextField PortTextInput;
     private JButton validerButton;
 
-    private ClientObservable client;
+    private Client client;
 
     /**
      * Creates new form
      */
-    public MainForm(ClientObservable _client) {
+    public MainForm(Client _client) {
         this.client = _client;
         this.initComponents();
 
@@ -30,19 +30,18 @@ public class MainForm implements Observer {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                AddressTextInput.setText("lol");
-                PortTextInput.setText("lol");
             }
         });
     }
-
 
 
     /**
      * Function will initialize the different components of the window
      */
     public void initComponents(){
-
+        this.setSize(400, 400);
+        this.panel1.setVisible(true);
+        this.add(panel1);
     };
 
     @Override

@@ -4,8 +4,11 @@ import com.polytech4A.pop3.client.ui.MainForm;
 
 public class ClientMain {
     public static void main(String[] args){
-        ClientObservable client = new ClientObservable();
+        Client client = new Client();
         MainForm window = new MainForm(client);
+        window.setVisible(true);
         client.addObserver(window);
+        
+        client.establishConnection();
     }
 }
