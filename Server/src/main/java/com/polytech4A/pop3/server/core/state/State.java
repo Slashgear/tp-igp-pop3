@@ -10,6 +10,7 @@ package com.polytech4A.pop3.server.core.state;
  */
 public abstract class State {
 
+
     /**
      * Next state in which the object will be.
      */
@@ -22,19 +23,37 @@ public abstract class State {
     /**
      * Getter of the next state.
      *
-     * @return State nextState.
+     * @return nextState State.
      */
     public State getNextState() {
         return nextState;
     }
 
     /**
+     * Setter of the next state.
+     *
+     * @param nextState State.
+     */
+    public void setNextState(State nextState) {
+        this.nextState = nextState;
+    }
+
+    /**
      * Getter of the message to send.
      *
-     * @return Message msgToSend.
+     * @return msgToSend String.
      */
     public String getMsgToSend() {
         return msgToSend;
+    }
+
+    /**
+     * Setter of message to send.
+     *
+     * @param msgToSend String.
+     */
+    public void setMsgToSend(String msgToSend) {
+        this.msgToSend = msgToSend;
     }
 
     /**
@@ -49,7 +68,7 @@ public abstract class State {
      *
      * @param message String
      */
-    public abstract void analyze(String message);
+    public abstract boolean analyze(String message);
 
     /**
      * Does the associated action of the State.
