@@ -8,12 +8,16 @@ package com.polytech4A.pop3.client.core.state;
  * State connected of the client: waiting for the Welcome message of the server and will goo to next state (Authentication)
  */
 public class StateStarted extends State{
-    //if message = "OK $nomServer POP3 server ready
+    //if message = "OK $nomServer POP3 server ready"
     //go to next state
 
-    @Override
-    public void analyze(String message) {
+    public StateStarted(){
+    }
 
+
+    @Override
+    public boolean analyze(String message) {
+        return false;
     }
 
     @Override
