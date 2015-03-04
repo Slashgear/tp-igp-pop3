@@ -30,15 +30,19 @@ public class Client extends Observable implements Runnable {
     /**
      * Make the connection with the server and call the constructor of the first state (Started)
      */
-    public void establishConnection(){
-        // TODO : Change adress and port to get them with the view
+    public void establishConnection(String addressString, int port){
         InetAddress address = null;
-        int port = 500;
         try {
-            address = InetAddress.getLocalHost();
+            address = InetAddress.getByName(addressString);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
+        //int port = 500;
+        /* try {
+            address = InetAddress.getLocalHost();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } */
 
         this.connection = new ClientConnection(address, port);
         this.currentState = new StateStarted();

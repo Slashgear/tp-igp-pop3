@@ -3,6 +3,8 @@ package com.polytech4A.pop3.client.ui;
 import com.polytech4A.pop3.client.core.Client;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Observable;
@@ -26,10 +28,9 @@ public class MainForm extends javax.swing.JFrame implements Observer {
         this.client = _client;
         this.initComponents();
 
-        validerButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                super.mouseClicked(e);
+        validerButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                validateButtonActionPerformed(evt);
             }
         });
     }
@@ -43,6 +44,17 @@ public class MainForm extends javax.swing.JFrame implements Observer {
         this.panel1.setVisible(true);
         this.add(panel1);
     };
+
+    /**
+     * When a click on the button occured, we call a connection request of the client
+     * @param evt
+     */
+    private void validateButtonActionPerformed(java.awt.event.ActionEvent evt){
+        String address = this.AddressTextInput.getText();
+        int port = Integer.parseInt(this.PortTextInput.getText());
+
+        this.client.establishConnection(address, port);
+    }
 
     @Override
     public void update(Observable o, Object arg) {

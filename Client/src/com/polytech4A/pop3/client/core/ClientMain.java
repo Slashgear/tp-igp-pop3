@@ -8,7 +8,5 @@ public class ClientMain {
         MainForm window = new MainForm(client);
         window.setVisible(true);
         client.addObserver(window);
-        
-        client.establishConnection();
     }
 }
