@@ -1,4 +1,4 @@
-package com.polytech4A.pop3.mailManager;
+package com.polytech4A.pop3.mailmanager;
 
 /**
  * Created by Dimitri on 03/03/2015.

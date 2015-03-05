@@ -1,4 +1,4 @@
-package com.polytech4A.pop3.mailManager;
+package com.polytech4A.pop3.mailmanager;
 
 import java.util.Date;
 import java.util.regex.Pattern;

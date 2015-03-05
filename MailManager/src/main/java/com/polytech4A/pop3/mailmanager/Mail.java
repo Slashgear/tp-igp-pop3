@@ -1,9 +1,6 @@
-package com.polytech4A.pop3.mailManager;
+package com.polytech4A.pop3.mailmanager;
 
-import com.polytech4A.pop3.mailManager.Exceptions.MalFormedMailException;
-
-import java.util.Date;
-import java.util.regex.Pattern;
+import com.polytech4A.pop3.mailmanager.Exceptions.MalFormedMailException;
 
 /**
  * Created by Dimitri on 02/03/2015.
