@@ -3,6 +3,7 @@ package com.polytech4A.pop3.client.ui;
 import com.polytech4A.pop3.client.core.Client;
 import com.polytech4A.pop3.client.core.state.State;
 import com.polytech4A.pop3.client.core.state.StateAuthentication;
+import com.polytech4A.pop3.client.core.state.StateTransaction;
 
 import javax.swing.*;
 import java.util.Observable;
@@ -20,6 +21,9 @@ public class MainForm extends javax.swing.JFrame implements Observer {
     private JTextField passwordTextInput;
     private JButton validerButton1;
     private JTextField userTextInput;
+    private JPanel panel3;
+    private JEditorPane resultPanel;
+    private JButton closeButton;
 
     private Client client;
 
@@ -39,6 +43,12 @@ public class MainForm extends javax.swing.JFrame implements Observer {
         validerButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 validateButton1ActionPerformed(evt);
+            }
+        });
+
+        closeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                closeButtonActionPerformed(evt);
             }
         });
     }
@@ -78,13 +88,27 @@ public class MainForm extends javax.swing.JFrame implements Observer {
     }
 
 
+    /**
+     * Will close the connection, delete the different objects instantiate in the client,
+     * and go back to the first view
+     * @param evt
+     */
+    private void closeButtonActionPerformed(java.awt.event.ActionEvent evt){
+        this.client.closeConnection();
+        this.panel3.setVisible(false);
+        this.remove(panel3);
+        this.panel1.setVisible(true);
+        this.add(panel1);
+    }
+
+
     @Override
     public void update(Observable o, Object arg) {
         if(o instanceof Client){
             //Will show errors if they occurred
             if(((Client) o).getErrorOccurred()){
-                JOptionPane.showMessageDialog(null, ((Client) o).getLastErrorMessage(),
-                        "Erreur au sein de l'application", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, ((Client) o).getLastErrorMessage(), "Erreur au sein de l'application", JOptionPane.ERROR_MESSAGE);
+                //TODO Close the connection if needed: new parameter?
             }
 
             State currentState = ((Client) o).getCurrentState();
@@ -94,6 +118,15 @@ public class MainForm extends javax.swing.JFrame implements Observer {
                 this.remove(panel1);
                 this.panel2.setVisible(true);
                 this.add(panel2);
+            }
+
+            if(currentState instanceof StateTransaction){
+                this.panel2.setVisible(false);
+                this.remove(panel2);
+                this.panel3.setVisible(true);
+                this.add(panel3);
+
+                this.resultPanel.setText("");
             }
         }
     }

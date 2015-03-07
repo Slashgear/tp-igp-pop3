@@ -88,6 +88,13 @@ public class Client extends Observable implements Runnable {
     public void closeConnection(){
         try {
             this.connection.closeConnection();
+            this.connection = null;
+            this.currentState = null;
+            this.errorOccurred = false;
+            this.lastErrorMessage = null;
+
+            //Call to the garbage collector
+            System.gc();
         } catch (IOException e) {
             this.showError(e.getMessage());
         }

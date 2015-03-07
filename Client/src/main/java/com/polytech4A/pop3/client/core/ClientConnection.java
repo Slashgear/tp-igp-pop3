@@ -59,7 +59,7 @@ public class ClientConnection{
     }
 
     /**
-     * Will close the connection with the server by closing the socket
+     * End the connection with the server by closing the socket
      */
     public void closeConnection() throws IOException {
         try {
@@ -71,7 +71,7 @@ public class ClientConnection{
 
 
     /**
-     *
+     * Send the message to the server through the created streams
      */
     public void sendMessage(String message) throws IOException {
         try {
@@ -83,7 +83,7 @@ public class ClientConnection{
     }
 
     /**
-     * Will wait for the response and send back the response with a string format
+     * Wait for the response from the server and send back the response with a string format
      */
     public String waitForResponse() throws Exception {
         StringBuilder response = new StringBuilder();

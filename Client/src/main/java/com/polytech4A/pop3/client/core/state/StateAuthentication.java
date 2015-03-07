@@ -24,6 +24,6 @@ public class StateAuthentication extends State {
 
     @Override
     public void action() {
-
+        this.setNextState(new StateTransaction());
     }
 }
