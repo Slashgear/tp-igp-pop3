@@ -5,14 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.polytech4A.pop3.client</groupId>
-    <artifactId>Server</artifactId>
+    <artifactId>Client</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <parent>
-        <artifactId>tp-igp-pop3</artifactId>
-        <groupId>com.polytech4A.pop3.server</groupId>
-        <version>1.0-SNAPSHOT</version>
-    </parent>
     <dependencies>
         <dependency>
             <groupId>com.polytech4A.pop3.messages</groupId>
@@ -20,4 +15,5 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
+
 </project>
