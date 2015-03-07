@@ -7,6 +7,9 @@ import java.util.ArrayList;
 
 /**
  * Created by Dimitri on 03/03/2015.
+ * @version 1.1
+ *          <p/>
+ *          Mail Manager for POP3.
  */
 public abstract class MailManager {
 
@@ -28,16 +31,14 @@ public abstract class MailManager {
                 userMailFolder = new File(path+"Mails/"),
                 userLoginsFile = new File(path+"Mails/logins.txt");
 
-        if (!userFolder.exists()) {
-            try{
-                userFolder.mkdir();
-                userMailFolder.mkdir();
-                userLoginsFile.createNewFile();
-            } catch(SecurityException se){
-                MailManagerException ex = new MailManagerException("MailManager.initDirectory : Could not create folders at "+path);
-            } catch (IOException e) {
-                MailManagerException ex = new MailManagerException("MailManager.initDirectory : Could not create logins.txt at "+path+"Mails/");
+        if (!userFolder.exists()) try {
+            if (!(userFolder.mkdir() && userMailFolder.mkdir() && userLoginsFile.createNewFile())) {
+                MailManagerException ex = new MailManagerException("MailManager.initDirectory : Could not init directories at " + path);
             }
+        } catch (SecurityException se) {
+            MailManagerException ex = new MailManagerException("MailManager.initDirectory : Could not create folders at " + path);
+        } catch (IOException e) {
+            MailManagerException ex = new MailManagerException("MailManager.initDirectory : Could not create logins.txt at " + path + "Mails/");
         }
         path+="Mails/";
     }

@@ -4,6 +4,9 @@ import java.util.ArrayList;
 
 /**
  * Created by Dimitri on 07/03/2015.
+ * @version 1.1
+ *          <p/>
+ *          Server Mail Manager for POP3.
  */
 public class ServerMailManager extends MailManager{
 
@@ -37,8 +40,6 @@ public class ServerMailManager extends MailManager{
     public ArrayList<Mail> getMails (User user){
         int index = users.indexOf(user);
         if (index>=0&&users.get(index).isLocked()){
-
-            ArrayList<Mail> mails = users.get(index).getMails();
             for (Mail mail : users.get(index).getMails()){
                 users.get(index).deleteMail(mail);
             }
@@ -48,20 +49,17 @@ public class ServerMailManager extends MailManager{
 
     /**
      * Check if a MailManager's user is locked
-     * @param user
+     * @param user : User to test
      * @return true if the user is locked
      */
     public boolean isLockedUser(User user){
         int index = users.indexOf(user);
-        if (index>=0&&!users.get(index).isLocked()){
-            return true;
-        }
-        return false;
+        return index >= 0 && !users.get(index).isLocked();
     }
 
     /**
      * Unlock a MailManager's user if possible
-     * @param user
+     * @param user : User to unlock
      */
     public void unlockUser(User user){
         int index = users.indexOf(user);

@@ -5,6 +5,9 @@ import java.util.regex.Pattern;
 
 /**
  * Created by Dimitri on 04/03/2015.
+ *  * @version 1.1
+ *          <p/>
+ *          Header of POP3 email.
  */
 public class Header {
 

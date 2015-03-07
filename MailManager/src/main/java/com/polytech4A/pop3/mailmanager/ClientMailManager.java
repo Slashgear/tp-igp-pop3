@@ -2,6 +2,9 @@ package com.polytech4A.pop3.mailmanager;
 
 /**
  * Created by Dimitri on 07/03/2015.
+ * @version 1.1
+ *          <p/>
+ *          Client Mail Manager for POP3.
  */
 public class ClientMailManager extends MailManager {
 
