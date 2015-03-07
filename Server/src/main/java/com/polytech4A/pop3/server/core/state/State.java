@@ -70,10 +70,4 @@ public abstract class State {
      */
     public abstract boolean analyze(String message);
 
-    /**
-     * Does the associated action of the State.
-     *
-     * @param message
-     */
-    public abstract void action(String message);
 }

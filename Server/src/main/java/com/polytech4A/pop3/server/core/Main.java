@@ -23,10 +23,13 @@ public class Main {
     /**
      * Main function.
      *
-     * @param args arg0= port, arg1= nbConnection
+     * @param args arg0 = port, arg1 = nbConnection, arg2 = boolDeleteMsg
      */
     public static void main(String[] args) {
         defineLogger();
+        Server server = new Server(110, 10);
+        server.listen();
+        server.close();
     }
 
     /**

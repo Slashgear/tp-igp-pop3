@@ -19,7 +19,6 @@ public class Server {
     /**
      * Logger of the server.
      */
-    //TODO : Develop a local logger in file. And then in html page.
     private static Logger logger = Logger.getLogger(Server.class);
 
     /**
@@ -87,12 +86,14 @@ public class Server {
      */
     public void listen() {
         //TODO : Handle a better exit condition.
-        while (true) {
+        boolean listening = true;
+        while (listening) {
             try {
                 this.openConnection(this.socket.accept());
             } catch (IOException e) {
                 logger.error("Error during connection accepting");
                 logger.error(e.getMessage());
+                listening = false;
             }
         }
     }

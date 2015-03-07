@@ -1,5 +1,7 @@
 package com.polytech4A.pop3.server.core.state;
 
+import com.polytech4A.pop3.messages.OkMessages.ServerReadyMessage;
+
 /**
  * Created by Adrien on 02/03/2015.
  *
@@ -10,18 +12,21 @@ package com.polytech4A.pop3.server.core.state;
  */
 public class StateInit extends State {
     /**
-     * {@inheritDoc}
+     * Initialization state constructor.
      */
-    @Override
-    public void analyze(String message) {
-
+    public StateInit() {
+        super();
+        this.setNextState(new StateAuth());
+        //TODO: handle server name by getting a const set in an other class.
+        this.setMsgToSend(new ServerReadyMessage("serverName").toString());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void action(String message) {
-
+    public boolean analyze(String message) {
+        return true;
     }
+
 }
