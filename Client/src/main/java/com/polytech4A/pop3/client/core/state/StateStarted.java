@@ -5,7 +5,7 @@ package com.polytech4A.pop3.client.core.state;
  */
 
 
-/*
+/**
  * State connected of the client: waiting for the Welcome message of the server and will goo to next state (Authentication)
  */
 public class StateStarted extends State{

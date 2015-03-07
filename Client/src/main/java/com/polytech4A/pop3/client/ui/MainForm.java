@@ -71,7 +71,7 @@ public class MainForm extends javax.swing.JFrame implements Observer {
 
 
     /**
-     * When a click on the button 1 occured, we call a connection request of the client
+     * When a click on the button 1 occured, we call an authentification request on the client
      * @param evt
      */
     private void validateButton1ActionPerformed(java.awt.event.ActionEvent evt){
@@ -85,6 +85,12 @@ public class MainForm extends javax.swing.JFrame implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         if(o instanceof Client){
+            //Will show errors if they occurred
+            if(((Client) o).getErrorOccurred()){
+                JOptionPane.showMessageDialog(null, ((Client) o).getLastErrorMessage(),
+                        "Erreur au sein de l'application", JOptionPane.ERROR_MESSAGE);
+            }
+
             State currentState = ((Client) o).getCurrentState();
 
             if(currentState instanceof StateAuthentification){

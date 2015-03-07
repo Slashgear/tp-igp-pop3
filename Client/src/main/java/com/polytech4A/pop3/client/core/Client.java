@@ -23,12 +23,22 @@ public class Client extends Observable implements Runnable {
 
     private ClientConnection connection;
     private State currentState;
+    private Boolean errorOccurred = false;
+    private String lastErrorMessage;
 
     public Client() {
     }
 
     public State getCurrentState() {
         return currentState;
+    }
+
+    public Boolean getErrorOccurred() {
+        return errorOccurred;
+    }
+
+    public String getLastErrorMessage() {
+        return lastErrorMessage;
     }
 
     /**
@@ -132,11 +142,23 @@ public class Client extends Observable implements Runnable {
 
             if(expired[0]){
                 System.out.println("Connexion expirée");
+                this.showError("Connexion expirée");
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         return response.toString();
+    }
+
+
+    /**
+     * Will send the error to the view
+     * @param message Message to show to the user
+     */
+    private void showError(String message){
+        this.errorOccurred = true;
+        this.lastErrorMessage = message;
+        this.updateObservers();
     }
 }
