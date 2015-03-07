@@ -19,6 +19,9 @@ public abstract class State {
      */
     private String msgToSend;
 
+
+    private Boolean waitForTheUser;
+
     /**
      * Getter of the next state.
      *
@@ -53,6 +56,15 @@ public abstract class State {
      */
     public void setMsgToSend(String msgToSend) {
         this.msgToSend = msgToSend;
+    }
+
+
+    public Boolean getWaitForTheUser() {
+        return waitForTheUser;
+    }
+
+    public void setWaitForTheUser(Boolean waitForTheUser) {
+        this.waitForTheUser = waitForTheUser;
     }
 
     /**

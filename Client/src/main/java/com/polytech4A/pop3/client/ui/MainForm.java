@@ -2,13 +2,9 @@ package com.polytech4A.pop3.client.ui;
 
 import com.polytech4A.pop3.client.core.Client;
 import com.polytech4A.pop3.client.core.state.State;
-import com.polytech4A.pop3.client.core.state.StateAuthentification;
+import com.polytech4A.pop3.client.core.state.StateAuthentication;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -59,7 +55,7 @@ public class MainForm extends javax.swing.JFrame implements Observer {
 
 
     /**
-     * When a click on the button occured, we call a connection request of the client
+     * When a click on the button occurred, we call a connection request of the client
      * @param evt
      */
     private void validateButtonActionPerformed(java.awt.event.ActionEvent evt){
@@ -71,14 +67,14 @@ public class MainForm extends javax.swing.JFrame implements Observer {
 
 
     /**
-     * When a click on the button 1 occured, we call an authentification request on the client
+     * When a click on the button 1 occurred, we call an authentication request on the client
      * @param evt
      */
     private void validateButton1ActionPerformed(java.awt.event.ActionEvent evt){
         String user = this.userTextInput.getText();
         String password = this.passwordTextInput.getText();
 
-        this.client.makeAuthentification(user, password);
+        this.client.makeAuthentication(user, password);
     }
 
 
@@ -93,7 +89,7 @@ public class MainForm extends javax.swing.JFrame implements Observer {
 
             State currentState = ((Client) o).getCurrentState();
 
-            if(currentState instanceof StateAuthentification){
+            if(currentState instanceof StateAuthentication){
                 this.panel1.setVisible(false);
                 this.remove(panel1);
                 this.panel2.setVisible(true);

@@ -3,11 +3,18 @@ package com.polytech4A.pop3.client.core;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Connection class for the client
  */
 public class ClientConnection{
+    /**
+     * Timeout in seconds
+     */
+    private static final int TIMEOUT = 5;
+
     private Socket socket;
     private BufferedOutputStream bufferedOutputStream;
     private BufferedInputStream bufferedInputStream;
@@ -15,7 +22,7 @@ public class ClientConnection{
     public ClientConnection(){
     }
 
-    public ClientConnection(InetAddress address, int port){
+    public ClientConnection(InetAddress address, int port) throws IOException {
         this.createConnection(address, port);
     }
 
@@ -35,9 +42,9 @@ public class ClientConnection{
      * Initialise the connection with the server and different objects with it, like the input and output streams
      *
      * @param port      Port of the server to reach
-     * @param address   IP Adress of the server to reach
+     * @param address   IP Address of the server to reach
      */
-    private void createConnection(InetAddress address, int port) {
+    private void createConnection(InetAddress address, int port) throws IOException {
         try {
             this.socket = new Socket(address, port);
             InputStream inputStream = this.getSocket().getInputStream();
@@ -47,18 +54,69 @@ public class ClientConnection{
             this.bufferedInputStream = new BufferedInputStream(inputStream);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            throw e;
         }
     }
 
     /**
      * Will close the connection with the server by closing the socket
      */
-    public void closeConnection(){
+    public void closeConnection() throws IOException {
         try {
             this.socket.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw e;
         }
-    };
+    }
+
+
+    /**
+     *
+     */
+    public void sendMessage(String message) throws IOException {
+        try {
+            this.bufferedOutputStream.write(message.getBytes());
+            this.bufferedOutputStream.flush();
+        } catch (IOException e) {
+            throw e;
+        }
+    }
+
+    /**
+     * Will wait for the response and send back the response with a string format
+     */
+    public String waitForResponse() throws Exception {
+        StringBuilder response = new StringBuilder();
+        BufferedInputStream bi = this.bufferedInputStream;
+
+        try {
+            /* We are going to wait until the response arrived or the timeout expired*/
+            final Boolean[] expired = {false};
+
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    expired[0] = true;
+                }
+            }, this.TIMEOUT * 1000);
+
+
+            while (bi.available()==0 || !expired[0]){
+
+            }
+
+            while (bi.available() != 0) {
+                response.append((char) bi.read());
+            }
+
+            if(expired[0]){
+                throw new Exception("Connexion expired");
+            }
+        } catch (IOException e) {
+            throw e;
+        }
+
+        return response.toString();
+    }
 }
