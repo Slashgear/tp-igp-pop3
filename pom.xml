@@ -16,6 +16,7 @@
     <packaging>pom</packaging>
     <name>tp-igp-pop3</name>
     <modules>
+        <module>MailManager</module>
         <module>Messages</module>
         <module>Server</module>
     </modules>
