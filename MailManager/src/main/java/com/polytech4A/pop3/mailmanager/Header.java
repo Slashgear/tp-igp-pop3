@@ -122,55 +122,78 @@ public class Header {
         return res.append(END_LINE);
     }
 
+    /**
+     * Check if a line contains the Mail's receiver
+     * @return true if the line contains the receiver
+     */
     public boolean parseReceiver(){
         String[] tamp;
         if (Pattern.matches("TO:\\S" + END_LINE, output)){
             tamp=output.toString().split("TO:");
-            tamp=tamp[1].toString().split(END_LINE);
+            tamp= tamp[1].split(END_LINE);
             receiver=tamp[0];
             return true;
         }
         else return false;
     }
 
+    /**
+     * Check if a line contains the Mail's sender
+     * @return true if the line contains the sender
+     */
     public boolean parseSender(){
         String[] tamp;
         if (Pattern.matches("FROM:\\S"+END_LINE,output)){
             tamp=output.toString().split("FROM:");
-            tamp=tamp[1].toString().split(END_LINE);
+            tamp= tamp[1].split(END_LINE);
             sender=tamp[0];
             return true;
         }
         else return false;
     }
 
+    /**
+     * Check if a line contains the Mail's subject
+     * @return true if the line contains the subject
+     */
     public boolean parseSubject(){
         String[] tamp;
         if (Pattern.matches("SUBJECT:\\S"+END_LINE,output)){
             tamp=output.toString().split("SUBJECT:");
-            tamp=tamp[1].toString().split(END_LINE);
+            tamp= tamp[1].split(END_LINE);
             subject=tamp[0];
             return true;
         }
         else return false;
     }
 
+    /**
+     * Check if a line contains the Mail's date
+     * @return true if the line contains the date
+     */
     public boolean parseDate(){
         String[] tamp;
         if (Pattern.matches("ORIG-DATE:\\S"+END_LINE,output)){
             tamp=output.toString().split("ORIG-DATE:");
-            tamp=tamp[1].toString().split(END_LINE);
+            tamp=tamp[1].split(END_LINE);
             sendingDate= new Date(tamp[0]);
             return true;
         }
         else return false;
     }
 
+    /**
+     * Check if a line contains the Mail's header
+     * @return true if the line contains the header
+     */
     public boolean parseHeader (StringBuffer header){
         this.output=header;
         return parseSender()&&parseReceiver()&&parseSubject()&&parseDate();
     }
 
+    /**
+     * Build the mail Header
+     */
     public void buildHeader(){
         sendingDate=new Date();
         output=new StringBuffer();

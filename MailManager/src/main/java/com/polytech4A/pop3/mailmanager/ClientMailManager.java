@@ -4,6 +4,7 @@ package com.polytech4A.pop3.mailmanager;
  * Created by Dimitri on 07/03/2015.
  */
 public class ClientMailManager extends MailManager {
+
     /**
      * Constructor of the ClientMailManager
      * @param login

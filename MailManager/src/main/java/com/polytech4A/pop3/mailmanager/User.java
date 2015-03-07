@@ -47,7 +47,7 @@ public class User {
 
     /**
      * Getter of the User's mail list
-     * @return
+     * @return List of mails
      */
     public ArrayList<Mail> getMails() {
         return mails;
@@ -74,7 +74,7 @@ public class User {
 
     /**
      * Remove a mail from the user's mail list
-     * @param mail
+     * @param mail : Mail to delete
      */
     public void deleteMail(Mail mail){
         mails.remove(mail);

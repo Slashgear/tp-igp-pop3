@@ -26,6 +26,14 @@ public class Mail {
      */
     private StringBuffer output;
 
+    /***
+     * Getter of the header of the mail
+     * @return
+     */
+    public Header getHeader(){
+        return header;
+    }
+
     /**
      * Getter of Output.
      *
