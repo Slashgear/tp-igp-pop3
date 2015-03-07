@@ -37,12 +37,6 @@ public class Client extends Observable implements Runnable {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        //int port = 500;
-        /* try {
-            address = InetAddress.getLocalHost();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        } */
 
         this.connection = new ClientConnection(address, port);
         this.currentState = new StateStarted();

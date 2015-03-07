@@ -15,6 +15,7 @@ import java.util.Observer;
  */
 public class MainForm extends javax.swing.JFrame implements Observer {
     private JPanel panel1;
+    private JPanel panel2;
     private JTextField AddressTextInput;
     private JTextField PortTextInput;
     private JButton validerButton;
@@ -42,7 +43,8 @@ public class MainForm extends javax.swing.JFrame implements Observer {
     public void initComponents(){
         this.setSize(400, 400);
         this.panel1.setVisible(true);
-        this.add(panel1);
+        this.panel2.setVisible(true);
+        this.add(panel2);
     };
 
     /**
