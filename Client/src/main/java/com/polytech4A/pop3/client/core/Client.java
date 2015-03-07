@@ -8,15 +8,27 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Observable;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Main class for the client
  */
 public class Client extends Observable implements Runnable {
+
+    /**
+     * Timeout in seconds
+     */
+    private static final int TIMEOUT = 5;
+
     private ClientConnection connection;
     private State currentState;
 
     public Client() {
+    }
+
+    public State getCurrentState() {
+        return currentState;
     }
 
     /**
@@ -26,6 +38,7 @@ public class Client extends Observable implements Runnable {
         setChanged();
         notifyObservers();
     }
+
 
     /**
      * Make the connection with the server and call the constructor of the first state (Started)
@@ -38,9 +51,24 @@ public class Client extends Observable implements Runnable {
             e.printStackTrace();
         }
 
+        System.out.println("Etablissement de la connexion");
         this.connection = new ClientConnection(address, port);
+        System.out.println("Connexion établie");
         this.currentState = new StateStarted();
+        this.processing();
     }
+
+
+    /**
+     *
+     * @param user
+     * @param password
+     */
+    public void makeAuthentification(String user, String password){
+        //Vérifier qu'on est bien dans l'état
+        //Envoyer à notre état les informations qui lui sont nécessaires
+    }
+
 
     /**
      * Will call the closing of the conection
@@ -55,6 +83,7 @@ public class Client extends Observable implements Runnable {
         this.processing();
     }
 
+
     /**
      * Allow the transition between states if the required conditions are OK
      */
@@ -64,11 +93,14 @@ public class Client extends Observable implements Runnable {
         if(this.currentState.analyze(response)){
             this.currentState.action();
             this.currentState = this.currentState.getNextState();
+            this.updateObservers();
         }
         else{
             //retry or send error
+            System.out.println("Erreur");
         }
     }
+
 
     /**
      * Will wait for the response and send back the response with a string format
@@ -78,13 +110,28 @@ public class Client extends Observable implements Runnable {
         BufferedInputStream bi = this.connection.getBufferedInputStream();
 
         try {
-            /* We are going to wait until the response arrived */
-            /* TODO : Timeout here */
-            while (bi.available()==0){
+            /* We are going to wait until the response arrived or the timeout expired*/
+            final Boolean[] expired = {false};
+
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    expired[0] = true;
+                }
+            }, this.TIMEOUT * 1000);
+
+
+            while (bi.available()==0 || !expired[0]){
 
             }
+
             while (bi.available() != 0) {
                 response.append((char) bi.read());
+            }
+
+            if(expired[0]){
+                System.out.println("Connexion expirée");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -92,6 +139,4 @@ public class Client extends Observable implements Runnable {
 
         return response.toString();
     }
-
-
 }
