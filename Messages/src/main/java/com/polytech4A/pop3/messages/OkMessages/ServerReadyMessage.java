@@ -1,4 +1,6 @@
-package com.polytech4A.pop3.messages;
+package com.polytech4A.pop3.messages.OkMessages;
+
+import com.polytech4A.pop3.messages.OkMessage;
 
 import java.util.regex.Pattern;
 
