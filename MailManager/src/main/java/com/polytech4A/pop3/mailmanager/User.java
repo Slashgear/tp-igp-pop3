@@ -99,7 +99,7 @@ public class User {
             try {
                 return f.createNewFile();
             } catch (IOException e) {
-                MailManagerException ex = new MailManagerException("User.lockUser : Can't create file : "+path+"Mails/"+login+"/lock.txt");
+                MailManagerException ex = new MailManagerException("User.lockUser : Can't create file : "+path+"/lock.txt");
                 System.out.println(ex.getMessage());
             }
         }
