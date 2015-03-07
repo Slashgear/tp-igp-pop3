@@ -10,56 +10,108 @@ import java.util.Scanner;
 
 /**
  * Created by Dimitri on 04/03/2015.
+ * @version 1.1
+ *          <p/>
+ *          Users for POP3.
  */
 public class User {
-    private String login;
-    private String password;
-    private ArrayList<Mail> mails;
 
-    public User(String login, String password) {
+    /**
+     * Login of the User
+     */
+    private String login;
+
+    /**
+     * Password of the User
+     */
+    private String password;
+
+    /**
+     * List of Mails of the User
+     */
+    private ArrayList<Mail> mails;
+    /**
+     * Path to the User's directory
+     */
+    private String path;
+
+    /**
+     * Constructor of the User
+     */
+    public User(String login, String password, String path) {
         this.login = login;
         this.password = password;
+        this.path=path+login;
         this.mails=new ArrayList<Mail>();
     }
 
-    public User(String login) {
-        this.login = login;
-        this.password="";
-        this.mails=new ArrayList<Mail>();
-    }
-
+    /**
+     * Getter of the User's mail list
+     * @return
+     */
     public ArrayList<Mail> getMails() {
         return mails;
     }
 
-    public void addMail(Mail mail){
-        mails.add(mail);
+    /**
+     * Check if a string is a valid pop3 mail to add it
+     * to the User's list
+     * @param content : String to test
+     * @return true if the string is a valid pop3 mail
+     */
+    public boolean addMail(String content){
+        try{
+            Mail mail = new Mail(content);
+            mails.add(mail);
+            return true;
+        } catch (MalFormedMailException e) {
+            MailManagerException ex = new MailManagerException("User.addMail : Can't add Mail : "+e.getMessage());
+            System.out.println(ex.getMessage());
+            return false;
+        }
+
     }
 
+    /**
+     * Remove a mail from the user's mail list
+     * @param mail
+     */
     public void deleteMail(Mail mail){
         mails.remove(mail);
     }
 
+    /**
+     * Check if the User is locked
+     * @return true if the User is locked
+     */
     public boolean isLocked (){
-        File f = new File("Mails/"+login+"/lock.txt");
+        File f = new File(path+"/lock.txt");
         return f.exists() && !f.isDirectory();
     }
 
+    /**
+     * Lock the User's directory to prevent multi-access if possible
+     * @return true the user can be locked
+     */
     public boolean lockUser (){
-        File f = new File("Mails/"+login+"/lock.txt");
+        File f = new File(path+"/lock.txt");
         if(!f.exists()&& !f.isDirectory()) {
             try {
                 return f.createNewFile();
             } catch (IOException e) {
-                MailManagerException ex = new MailManagerException("User.lockUser : Can't create file : Mails/"+login+"/lock.txt");
+                MailManagerException ex = new MailManagerException("User.lockUser : Can't create file : "+path+"Mails/"+login+"/lock.txt");
                 System.out.println(ex.getMessage());
             }
         }
         return false;
     }
 
+    /**
+     * Unlock the User's directory
+     * @return true if the user has been unlocked
+     */
     public boolean unlockUser(){
-        File f = new File("Mails/"+login+"/lock.txt");
+        File f = new File(path+"/lock.txt");
         if(f.exists()&& !f.isDirectory()) {
             if (f.delete()){
                 return true;
@@ -68,11 +120,14 @@ public class User {
         return false;
     }
 
+    /**
+     * Save the User's mails into its directory
+     */
     public void saveMails (){
         Date date = new Date();
 
         try {
-            BufferedWriter file = new BufferedWriter(new FileWriter("Mails/"+login+"/mails_"+date.toString()+".txt", true));
+            BufferedWriter file = new BufferedWriter(new FileWriter(path+"/mails_"+date.toString()+".txt", true));
             for (Mail mail : mails) {
                 file.write(mail.getOutput().toString());
                 file.newLine();
@@ -80,35 +135,16 @@ public class User {
             file.close();
 
         } catch (IOException e) {
-            MailManagerException ex = new MailManagerException("User.saveMail : Can't create file : Mails/"+login+"/mails_"+date.toString()+".txt");
+            MailManagerException ex = new MailManagerException("User.saveMail : Can't create file : "+path+"/mails_"+date.toString()+".txt");
             System.out.println(ex.getMessage());
         }
     }
 
-    public static ArrayList<User> getUsers(){
-        ArrayList<User> users = new ArrayList<User>();
-        try{
-            InputStream ips=new FileInputStream("Mails/logins.txt");
-            InputStreamReader ipsr=new InputStreamReader(ips);
-            BufferedReader br=new BufferedReader(ipsr);
-            String line;
-            String[] identification;
-
-            while ((line=br.readLine())!=null){
-                identification=line.split(" ");
-                users.add(new User(identification[0],identification[1]));
-            }
-            br.close();
-        }
-        catch (IOException e) {
-            MailManagerException ex = new MailManagerException("User.getUser : Can't open file : Mails/logins.txt");
-            System.out.println(ex.getMessage());
-        }
-        return users;
-    }
-
+    /**
+     * Get the User's mails in its directory
+     */
     public void initMails(){
-        File folder = new File ("Mails/"+login);
+        File folder = new File (path);
         try{
             for (File fileEntry : folder.listFiles()) {
                 if (!fileEntry.isDirectory()) {
@@ -116,14 +152,21 @@ public class User {
                 }
             }
         } catch (FileNotFoundException e) {
-            MailManagerException ex = new MailManagerException("User.initMails : File in 'Mails/"+login+"' not found");
+            MailManagerException ex = new MailManagerException("User.initMails : File in '"+path+"' not found");
             System.out.println(ex.getMessage());
         } catch (MalFormedMailException e) {
-            MailManagerException ex = new MailManagerException("User.InitMail : " + e.getMessage());
+            MailManagerException ex = new MailManagerException("User.InitMails : " + e.getMessage());
             System.out.println(ex.getMessage());
         }
     }
 
+    /**
+     * Creates a mail to be send by the User
+     * @param receiver : String of the receiver of the mail
+     * @param content : String of the content of the mail
+     * @param subject : String of the subject of the mail
+     * @return mail created
+     */
     public String createMail(String receiver, String content,String subject){
         Mail mail = new Mail(this.login, receiver,content,subject);
         return mail.getOutput().toString();

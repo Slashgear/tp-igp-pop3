@@ -6,7 +6,7 @@ import com.polytech4A.pop3.mailmanager.Exceptions.MalFormedMailException;
  * Created by Dimitri on 02/03/2015.
  * @version 1.1
  *          <p/>
- *          Mails exchange for POP3.
+ *          Mails exchanged for POP3.
  */
 public class Mail {
 
@@ -27,24 +27,6 @@ public class Mail {
     private StringBuffer output;
 
     /**
-     * Getter of Content.
-     *
-     * @return Content String.
-     */
-    public String getContent() {
-        return content;
-    }
-
-    /**
-     * Getter of Header.
-     *
-     * @return Header.
-     */
-    public Header getHeader() {
-        return header;
-    }
-
-    /**
      * Getter of Output.
      *
      * @return Output String.
@@ -59,7 +41,7 @@ public class Mail {
     public Mail(String receiver, String sender, String content, String subject) {
         this.header=new Header(receiver, sender,subject);
         this.content = content;
-
+        this.output = new StringBuffer();
         buildMail();
     }
 
