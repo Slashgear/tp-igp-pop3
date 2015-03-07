@@ -1,4 +1,6 @@
-package com.polytech4A.pop3.messages;
+package com.polytech4A.pop3.messages.ErrMessages;
+
+import com.polytech4A.pop3.messages.ErrMessage;
 
 /**
  * Created by Antoine on 05/03/2015.
@@ -15,7 +17,7 @@ public class AlreadyLockedErrMessage extends ErrMessage {
      * Constructor of AlreadyLockMessage.
      */
     public AlreadyLockedErrMessage() {
-        super(" Already locked mailbox");
+        super("Already locked mailbox");
     }
 
     /**

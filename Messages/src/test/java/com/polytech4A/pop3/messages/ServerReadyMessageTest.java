@@ -1,5 +1,6 @@
 package com.polytech4A.pop3.messages;
 
+import com.polytech4A.pop3.messages.OkMessages.ServerReadyMessage;
 import junit.framework.TestCase;
 
 /**
