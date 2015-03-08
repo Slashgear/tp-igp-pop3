@@ -24,6 +24,10 @@ public class StateTransaction extends State {
         this.lastSentMessage = 1;
     }
 
+    /**
+     * Return the request which has to been sent
+     * @return The request with the good id for the mail
+     */
     public String getMsgToSend(){
         if(this.lastSentMessage <= this.numberOfMessages){
             String toSend = new RetrMessage(this.lastSentMessage).toString();
@@ -35,6 +39,11 @@ public class StateTransaction extends State {
         }
     }
 
+    /**
+     * Parse the message to get the number of message we'll have to get from the server
+     * @param message OK APOP received from the server
+     * @return The number of message we have to obtain
+     */
     public int analyseNumberOfMessages(String message){
         try {
             OkApopMessage apopMessage = new OkApopMessage(message);

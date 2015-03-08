@@ -56,8 +56,9 @@ public class Client extends Observable implements Runnable {
         return lastErrorMessage;
     }
 
+
     /**
-     * Call the update of what must be show int the view
+     * Call the update of what must be show in the view
      */
     private void updateObservers() {
         setChanged();
@@ -142,6 +143,7 @@ public class Client extends Observable implements Runnable {
             try {
                 this.connection.sendMessage(toSend);
                 String messageReceived = this.connection.waitForResponse();
+                //TODO Treatment to do on this received message
                 this.newMessageToShow(messageReceived);
                 toSend = this.currentState.getMsgToSend();
             } catch (Exception e) {
@@ -150,11 +152,32 @@ public class Client extends Observable implements Runnable {
         }
         this.currentState.action();
         this.currentState = this.currentState.getNextState();
+        this.askForCloseConnection();
     }
 
 
     /**
-     * Will call the closing of the connection
+     * After the reception of the last message, we send a last message to the server
+     * We close the connection after that
+     */
+    private void askForCloseConnection(){
+        String toSend = this.currentState.getMsgToSend();
+
+        try {
+            this.connection.sendMessage(toSend);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        finally {
+            this.currentState.getNextState();
+            this.closeConnection();
+            this.updateObservers();
+        }
+    }
+
+
+    /**
+     * Will call the closing of the connection (call at the end or when an important error occurred)
      */
     public void closeConnection(){
         try {
@@ -203,6 +226,10 @@ public class Client extends Observable implements Runnable {
     }
 
 
+    /**
+     * Notify the view that we received a new message to show
+     * @param message The new message we get, it is added to our list
+     */
     private void newMessageToShow(String message){
         this.messageReceived.add(message);
         this.updateObservers();
