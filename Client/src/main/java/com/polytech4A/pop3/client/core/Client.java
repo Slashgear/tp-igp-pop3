@@ -3,10 +3,13 @@ package com.polytech4A.pop3.client.core;
 import com.polytech4A.pop3.client.core.state.State;
 import com.polytech4A.pop3.client.core.state.StateAuthentication;
 import com.polytech4A.pop3.client.core.state.StateStarted;
+import com.polytech4A.pop3.mailmanager.ClientMailManager;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Observable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Main class for the client
@@ -17,6 +20,7 @@ public class Client extends Observable implements Runnable {
     private State currentState;
     private Boolean errorOccurred = false;
     private String lastErrorMessage;
+    private ClientMailManager mailManager;
 
     public Client() {
     }
@@ -48,16 +52,27 @@ public class Client extends Observable implements Runnable {
      */
     public void establishConnection(String addressString, int port){
         InetAddress address = null;
-        try {
-            // TODO Delete les system.out.println
-            address = InetAddress.getByName(addressString);
-            System.out.println("Etablissement de la connexion");
-            this.connection = new ClientConnection(address, port);
-            System.out.println("Connexion établie");
-            this.currentState = new StateStarted();
-            this.processing();
-        } catch (Exception e) {
-            this.showError(e.getMessage());
+
+        /*Verification of the validity of the inputs*/
+        String IP_ADDRESS_PATTERN = "^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)" +
+                "\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
+        Matcher matcher = Pattern.compile(IP_ADDRESS_PATTERN).matcher(addressString);
+
+        if(port > 65535 || port < 1 || !matcher.find()){
+            this.showError("L'adresse IP ou le port ne sont pas corrects");
+        }
+        else{
+            try {
+                // TODO Delete les system.out.println
+                address = InetAddress.getByName(addressString);
+                System.out.println("Etablissement de la connexion");
+                this.connection = new ClientConnection(address, port);
+                System.out.println("Connexion établie");
+                this.currentState = new StateStarted();
+                this.processing();
+            } catch (Exception e) {
+                this.showError(e.getMessage());
+            }
         }
     }
 
@@ -71,9 +86,14 @@ public class Client extends Observable implements Runnable {
         if(this.currentState instanceof StateAuthentication){
             //Envoyer à notre état les informations qui lui sont nécessaires
             // que l'état envoie son message
+            String response;
             try {
                 this.connection.sendMessage(this.currentState.getMsgToSend());
-                this.connection.waitForResponse();
+                response = this.connection.waitForResponse();
+                if(this.currentState.analyze(response)){
+                    this.mailManager = new ClientMailManager(user);
+                    this.currentState.action();
+                }
 
             } catch (Exception e) {
                 this.showError(e.getMessage());

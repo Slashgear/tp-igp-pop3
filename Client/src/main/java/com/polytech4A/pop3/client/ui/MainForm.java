@@ -69,10 +69,12 @@ public class MainForm extends javax.swing.JFrame implements Observer {
      * @param evt
      */
     private void validateButtonActionPerformed(java.awt.event.ActionEvent evt){
-        String address = this.AddressTextInput.getText();
-        int port = Integer.parseInt(this.PortTextInput.getText());
+        if(!this.AddressTextInput.getText().equals("") && !this.PortTextInput.getText().equals("")){
+            String address = this.AddressTextInput.getText();
+            int port = Integer.parseInt(this.PortTextInput.getText());
 
-        this.client.establishConnection(address, port);
+            this.client.establishConnection(address, port);
+        }
     }
 
 
@@ -81,10 +83,12 @@ public class MainForm extends javax.swing.JFrame implements Observer {
      * @param evt
      */
     private void validateButton1ActionPerformed(java.awt.event.ActionEvent evt){
-        String user = this.userTextInput.getText();
-        String password = this.passwordTextInput.getText();
+        if(!this.userTextInput.getText().equals("") && !this.passwordTextInput.getText().equals("")){
+            String user = this.userTextInput.getText();
+            String password = this.passwordTextInput.getText();
 
-        this.client.makeAuthentication(user, password);
+            this.client.makeAuthentication(user, password);
+        }
     }
 
 
