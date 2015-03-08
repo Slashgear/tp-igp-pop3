@@ -1,5 +1,7 @@
 package com.polytech4A.pop3.mailmanager;
 
+import com.polytech4A.pop3.mailmanager.Exceptions.MailManagerException;
+
 /**
  * Created by Dimitri on 07/03/2015.
  *
@@ -16,9 +18,13 @@ public class ClientMailManager extends MailManager {
      */
     public ClientMailManager(String login) {
         super();
-        path = "Client/";
-        initDirectory();
-        initUser(login, "");
+        try {
+            path = "Client/";
+            initDirectory();
+            initUser(login, "");
+        } catch (MailManagerException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     /**

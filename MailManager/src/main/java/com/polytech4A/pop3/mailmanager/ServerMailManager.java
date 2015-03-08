@@ -1,5 +1,7 @@
 package com.polytech4A.pop3.mailmanager;
 
+import com.polytech4A.pop3.mailmanager.Exceptions.MailManagerException;
+
 import java.util.ArrayList;
 
 /**
@@ -16,9 +18,13 @@ public class ServerMailManager extends MailManager {
      */
     public ServerMailManager() {
         super();
-        path = "Server/";
-        initDirectory();
-        users = getUsers();
+        try {
+            path = "Server/";
+            initDirectory();
+            users = getUsers();
+        } catch (MailManagerException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     /**
