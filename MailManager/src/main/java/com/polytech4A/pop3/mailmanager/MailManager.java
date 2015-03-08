@@ -55,9 +55,10 @@ public abstract class MailManager {
      * Initialize a MailManager's user
      * @param login : String of the user's login
      * @param password : String of the user's password
-     * @return true if the User can be initialized
+     * @return Initialized user.
      */
-    protected abstract boolean initUser (String login, String password);
+    protected abstract User initUser (String login, String password);
+
 
     /**
      * Get the list of Users in a directory
@@ -66,9 +67,7 @@ public abstract class MailManager {
     public ArrayList<User> getUsers(){
         ArrayList<User> users = new ArrayList<User>();
         try{
-            InputStream ips=new FileInputStream(path+"logins.txt");
-            InputStreamReader ipsr=new InputStreamReader(ips);
-            BufferedReader br=new BufferedReader(ipsr);
+            BufferedReader br=new BufferedReader(new InputStreamReader(new FileInputStream(path + "logins.txt")));
             String line;
             String[] identification;
 

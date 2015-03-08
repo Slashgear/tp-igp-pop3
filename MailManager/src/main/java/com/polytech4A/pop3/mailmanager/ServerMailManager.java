@@ -4,44 +4,47 @@ import java.util.ArrayList;
 
 /**
  * Created by Dimitri on 07/03/2015.
+ *
  * @version 1.1
  *          <p/>
  *          Server Mail Manager for POP3.
  */
-public class ServerMailManager extends MailManager{
+public class ServerMailManager extends MailManager {
 
     /**
      * Constructor of ServerMailManager
      */
     public ServerMailManager() {
         super();
-        path ="Server/";
+        path = "Server/";
         initDirectory();
-        users =getUsers();
+        users = getUsers();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public boolean initUser(String login, String password){
-        User user = new User(login,password,path);
-        int index = users.indexOf(user);
-        if (index>=0&&!users.get(index).isLocked()){
+    public User initUser(String login, String password) {
+        User user = new User(login, password, path);
+        if (isLockedUser(user)) {
             user.lockUser();
             user.initMails();
-            return true;
+            return user;
         }
-        return false;
+        return null;
     }
 
     /**
      * Get the list of mails of a ServerMailManager's user
+     *
      * @param user : User
      * @return List of mails
      */
-    public ArrayList<Mail> getMails (User user){
-        int index = users.indexOf(user);
-        if (index>=0&&users.get(index).isLocked()){
-            for (Mail mail : users.get(index).getMails()){
-                users.get(index).deleteMail(mail);
+    public ArrayList<Mail> getMails(User user) {
+        if (isLockedUser(user)) {
+            for (Mail mail : user.getMails()) {
+                user.deleteMail(mail);
             }
         }
         return null;
@@ -49,22 +52,34 @@ public class ServerMailManager extends MailManager{
 
     /**
      * Check if a MailManager's user is locked
+     *
      * @param user : User to test
      * @return true if the user is locked
      */
-    public boolean isLockedUser(User user){
-        int index = users.indexOf(user);
-        return index >= 0 && !users.get(index).isLocked();
+    public boolean isLockedUser(User user) {
+        return users.contains(user) && !user.isLocked();
     }
 
     /**
      * Unlock a MailManager's user if possible
+     *
      * @param user : User to unlock
      */
-    public void unlockUser(User user){
-        int index = users.indexOf(user);
-        if (index>=0&&users.get(index).isLocked()){
-            users.get(index).unlockUser();
+    public void unlockUser(User user) {
+        if (users.contains(user) && user.isLocked()) {
+            user.unlockUser();
         }
+    }
+
+    /**
+     * Tests if the user exists and if the user is not already connected (lock).
+     *
+     * @param login    User login.
+     * @param password User password.
+     * @return True if user successfully log in.
+     */
+    public boolean isUserExists(String login, String password) {
+        User user = new User(login, password, path);
+        return isLockedUser(user);
     }
 }
