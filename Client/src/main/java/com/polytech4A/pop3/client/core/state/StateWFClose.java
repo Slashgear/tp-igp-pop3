@@ -19,6 +19,6 @@ public class StateWFClose extends State{
 
     @Override
     public void action() {
-
+        this.setNextState(null);
     }
 }

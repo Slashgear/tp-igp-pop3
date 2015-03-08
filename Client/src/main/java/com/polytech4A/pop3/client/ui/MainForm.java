@@ -25,6 +25,8 @@ public class MainForm extends javax.swing.JFrame implements Observer {
     private JEditorPane resultPanel;
     private JButton closeButton;
 
+    private JPanel currentPannel;
+
     private Client client;
 
     /**
@@ -61,6 +63,7 @@ public class MainForm extends javax.swing.JFrame implements Observer {
         this.setSize(400, 400);
         this.panel1.setVisible(true);
         this.add(panel1);
+        this.currentPannel = panel1;
     }
 
 
@@ -103,6 +106,7 @@ public class MainForm extends javax.swing.JFrame implements Observer {
         this.remove(panel3);
         this.panel1.setVisible(true);
         this.add(panel1);
+        this.currentPannel = panel1;
     }
 
 
@@ -112,16 +116,24 @@ public class MainForm extends javax.swing.JFrame implements Observer {
             //Will show errors if they occurred
             if(((Client) o).getErrorOccurred()){
                 JOptionPane.showMessageDialog(null, ((Client) o).getLastErrorMessage(), "Erreur au sein de l'application", JOptionPane.ERROR_MESSAGE);
-                //TODO Close the connection if needed: new parameter?
             }
 
             State currentState = ((Client) o).getCurrentState();
+
+            if(currentState == null){
+                this.currentPannel.setVisible(false);
+                this.remove(this.currentPannel);
+                this.panel1.setVisible(true);
+                this.add(panel1);
+                this.currentPannel = panel1;
+            }
 
             if(currentState instanceof StateAuthentication){
                 this.panel1.setVisible(false);
                 this.remove(panel1);
                 this.panel2.setVisible(true);
                 this.add(panel2);
+                this.currentPannel = panel2;
             }
 
             if(currentState instanceof StateTransaction){
@@ -129,8 +141,10 @@ public class MainForm extends javax.swing.JFrame implements Observer {
                 this.remove(panel2);
                 this.panel3.setVisible(true);
                 this.add(panel3);
+                this.currentPannel = panel3;
 
-                this.resultPanel.setText("");
+                //TODO Show all the messages received
+                this.resultPanel.setText(this.client.getMessageReceived().get(0));
             }
         }
     }

@@ -18,7 +18,7 @@ public class StateStarted extends State{
     @Override
     public boolean analyze(String message) {
         Boolean response = false;
-        response = new OkMessage().matches(message);
+        response = OkMessage.matches(message);
         return response;
     }
 

@@ -3,10 +3,12 @@ package com.polytech4A.pop3.client.core;
 import com.polytech4A.pop3.client.core.state.State;
 import com.polytech4A.pop3.client.core.state.StateAuthentication;
 import com.polytech4A.pop3.client.core.state.StateStarted;
+import com.polytech4A.pop3.client.core.state.StateTransaction;
 import com.polytech4A.pop3.mailmanager.ClientMailManager;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,6 +22,7 @@ public class Client extends Observable implements Runnable {
     private State currentState;
     private Boolean errorOccurred = false;
     private String lastErrorMessage;
+    private ArrayList<String> messageReceived;
     private ClientMailManager mailManager;
 
     public Client() {
@@ -29,14 +32,29 @@ public class Client extends Observable implements Runnable {
         return currentState;
     }
 
-    public Boolean getErrorOccurred() {
-        return errorOccurred;
+    public ArrayList<String> getMessageReceived() {
+        return messageReceived;
     }
+
+    /**
+     * it will send true if an error must be shown to the user,
+     * but will also set the value to false in case it is recalled
+     * @return If an error occurred
+     */
+    public Boolean getErrorOccurred() {
+        if(this.errorOccurred){
+            this.errorOccurred = false;
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
 
     public String getLastErrorMessage() {
         return lastErrorMessage;
     }
-
 
     /**
      * Call the update of what must be show int the view
@@ -78,27 +96,60 @@ public class Client extends Observable implements Runnable {
 
 
     /**
-     *
+     * Call by the view to make the authentication of a client, will send request to the server, wait the response
+     * and react to it
      * @param user String that will contain the mail address of the user
      * @param password String that will contain the password of the user
      */
     public void makeAuthentication(String user, String password){
         if(this.currentState instanceof StateAuthentication){
-            //Envoyer à notre état les informations qui lui sont nécessaires
-            // que l'état envoie son message
             String response;
             try {
+                ((StateAuthentication) this.currentState).setAuthenticationMessage(user, password);
                 this.connection.sendMessage(this.currentState.getMsgToSend());
                 response = this.connection.waitForResponse();
                 if(this.currentState.analyze(response)){
                     this.mailManager = new ClientMailManager(user);
+                    this.connection.sendMessage(this.currentState.getMsgToSend());
                     this.currentState.action();
+                    this.currentState = this.currentState.getNextState();
+                    this.receiveMessages(response);
                 }
-
+                else{
+                    if(((StateAuthentication) this.currentState).getNumberOfTries() > 2){
+                        this.showError("Nombre de tentatives dépassées");
+                        this.closeConnection();
+                    }
+                    else{
+                        this.showError("Erreur dans l'adresse mail ou le mot de passe");
+                    }
+                }
             } catch (Exception e) {
                 this.showError(e.getMessage());
             }
         }
+    }
+
+
+    /**
+     * Function which manage the reception of the messages from the server
+     * @param response Apop message which different parameters which need to be parse
+     */
+    private void receiveMessages(String response){
+        ((StateTransaction)this.currentState).analyseNumberOfMessages(response);
+        String toSend = this.currentState.getMsgToSend();
+        while(toSend != null){
+            try {
+                this.connection.sendMessage(toSend);
+                String messageReceived = this.connection.waitForResponse();
+                this.newMessageToShow(messageReceived);
+                toSend = this.currentState.getMsgToSend();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        this.currentState.action();
+        this.currentState = this.currentState.getNextState();
     }
 
 
@@ -149,6 +200,12 @@ public class Client extends Observable implements Runnable {
             //retry or send error
             System.out.println("Erreur");
         }
+    }
+
+
+    private void newMessageToShow(String message){
+        this.messageReceived.add(message);
+        this.updateObservers();
     }
 
 
