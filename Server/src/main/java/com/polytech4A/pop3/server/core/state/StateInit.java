@@ -1,6 +1,8 @@
 package com.polytech4A.pop3.server.core.state;
 
+import com.polytech4A.pop3.mailmanager.ServerMailManager;
 import com.polytech4A.pop3.messages.OkMessages.ServerReadyMessage;
+import com.polytech4A.pop3.server.core.Server;
 
 /**
  * Created by Adrien on 02/03/2015.
@@ -17,15 +19,14 @@ public class StateInit extends State {
     public StateInit() {
         super();
         this.setNextState(new StateAuth());
-        //TODO: handle server name by getting a const set in an other class.
-        this.setMsgToSend(new ServerReadyMessage("serverName").toString());
+        this.setMsgToSend(new ServerReadyMessage(Server.SERVER_NAME).toString());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean analyze(String message) {
+    public boolean analyze(String message, ServerMailManager manager) {
         return true;
     }
 

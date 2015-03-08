@@ -16,10 +16,10 @@ public class ServerMailManager extends MailManager {
     /**
      * Constructor of ServerMailManager
      */
-    public ServerMailManager() {
+    public ServerMailManager(String path) {
         super();
         try {
-            path = "Server/";
+            this.path = path;
             initDirectory();
             users = getUsers();
         } catch (MailManagerException e) {

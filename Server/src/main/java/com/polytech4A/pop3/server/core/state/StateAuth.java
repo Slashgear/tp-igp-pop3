@@ -1,5 +1,8 @@
 package com.polytech4A.pop3.server.core.state;
 
+import com.polytech4A.pop3.mailmanager.Mail;
+import com.polytech4A.pop3.mailmanager.ServerMailManager;
+import com.polytech4A.pop3.mailmanager.User;
 import com.polytech4A.pop3.messages.ApopMessage;
 import com.polytech4A.pop3.messages.Exceptions.MalFormedMessageException;
 import com.polytech4A.pop3.messages.PassMessage;
@@ -56,19 +59,18 @@ public class StateAuth extends State {
      * {@inheritDoc}
      */
     @Override
-    public boolean analyze(String message) {
+    public boolean analyze(String message, ServerMailManager manager) {
         try {
             if (ApopMessage.matches(message)) {
                 ApopMessage apop = new ApopMessage(message);
                 user = apop.getId();
                 password = apop.getPassword();
-                if(isIdPaswordValid()) {
+                if (manager.isUserExists(user, password)) {
+                    User usr = manager.initUser(user, password);
                     setNextState(new StateTransaction());
-                    //TODO : change numberMess
-                    setMsgToSend("+OK " + user + "'s maildrop has numberMess");
+                    buildSuccessLoginMessage(usr);
                     return true;
                 } else {
-                    nbTry++;
                     return invalidAuthProcessing();
                 }
             } else if (UserMessage.matches(message)) {
@@ -80,21 +82,18 @@ public class StateAuth extends State {
             } else if (PassMessage.matches(message)) {
                 PassMessage pw = new PassMessage(message);
                 password = pw.getPassword();
-                if(isIdPaswordValid()) {
+                if (manager.isUserExists(user, password)) {
+                    User usr = manager.initUser(user, password);
                     setNextState(new StateTransaction());
-                    //TODO : change numberMess
-                    setMsgToSend("+OK " + user + "'s maildrop has numberMess");
+                    buildSuccessLoginMessage(usr);
                     return true;
                 } else {
-                    nbTry++;
                     return invalidAuthProcessing();
                 }
             } else {
-                nbTry++;
                 return invalidAuthProcessing();
             }
         } catch (MalFormedMessageException e) {
-            nbTry++;
             return invalidAuthProcessing();
         }
     }
@@ -106,6 +105,7 @@ public class StateAuth extends State {
      * True if the connection still runs.
      */
     private boolean invalidAuthProcessing() {
+        nbTry++;
         setMsgToSend("-ERR permission denied");
         if (nbTry >= MAX_TRY) {
             setNextState(new StateInit());
@@ -116,13 +116,19 @@ public class StateAuth extends State {
         }
     }
 
-    /**
-     * Tests if informations provided by the client are correct and if he can log in.
-     *
-     * @return True if Id and password are valid. False if not.
-     */
-    private boolean isIdPaswordValid() {
-        //TODO : Use mail manager to check user informations.
-        return false;
+    private void buildSuccessLoginMessage(User user) {
+        int mailsSize = 0;
+        for(Mail mail : user.getMails()) {
+            mailsSize += mail.getOutput().toString().length();
+        }
+        StringBuffer buf = new StringBuffer("+OK ");
+        buf.append(user);
+        buf.append("'s maildrop has ");
+        buf.append(user.getMails().size());
+        buf.append(" messages (");
+        buf.append(mailsSize);
+        buf.append(")");
+        setMsgToSend(buf.toString());
     }
+
 }

@@ -27,7 +27,7 @@ public class Main {
      */
     public static void main(String[] args) {
         defineLogger();
-        Server server = new Server(110, 10);
+        Server server = new Server(110, 10, true);
         server.listen();
         server.close();
     }
