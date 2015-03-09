@@ -79,7 +79,8 @@ public class StateAuth extends State {
                 password = apop.getPassword();
                 if (manager.isUserExists(user, password)) {
                     User usr = manager.initUser(user, password);
-                    if(usr != null) {
+                    if(!manager.isLockedUser(usr)) {
+                        usr.lockUser();
                         setNextState(new StateTransaction());
                         int mailsSize = 0;
                         for(Mail mail : usr.getMails()) {

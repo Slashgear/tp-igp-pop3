@@ -35,6 +35,14 @@ public class User {
      */
     private String path;
 
+    public String getPassword() {
+        return password;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
     /**
      * Constructor of the User
      */

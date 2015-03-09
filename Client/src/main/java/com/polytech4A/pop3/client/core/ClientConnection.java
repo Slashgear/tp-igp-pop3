@@ -49,25 +49,16 @@ public class ClientConnection {
      * @param address IP Address of the server to reach
      */
     private void createConnection(InetAddress address, int port) throws IOException {
-        try {
-            this.socket = new Socket(address, port);
-            this.out = new BufferedOutputStream(this.getSocket().getOutputStream());
-            this.in = new BufferedInputStream(this.getSocket().getInputStream());
-
-        } catch (IOException e) {
-            throw e;
-        }
+        this.socket = new Socket(address, port);
+        this.out = new BufferedOutputStream(this.getSocket().getOutputStream());
+        this.in = new BufferedInputStream(this.getSocket().getInputStream());
     }
 
     /**
      * End the connection with the server by closing the socket
      */
     public void closeConnection() throws IOException {
-        try {
-            this.socket.close();
-        } catch (IOException e) {
-            throw e;
-        }
+        this.socket.close();
     }
 
 
@@ -75,13 +66,9 @@ public class ClientConnection {
      * Send the message to the server through the created streams
      */
     public void sendMessage(String message) throws IOException {
-        try {
-            logger.info("Client : " + message);
-            this.out.write(message.getBytes());
-            this.out.flush();
-        } catch (IOException e) {
-            throw e;
-        }
+        logger.info("Client : "+message);
+        this.out.write(message.getBytes());
+        this.out.flush();
     }
 
     /**
@@ -108,8 +95,7 @@ public class ClientConnection {
 
             logger.info("Server : " + response.toString());
         } catch (IOException e) {
-            this.logger.error("Error in the connection");
-            throw e;
+            this.logger.error(e.getMessage());
         }
         return response.toString();
     }
