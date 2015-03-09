@@ -185,7 +185,9 @@ public class Client extends Observable implements Runnable {
     private void receiveMessages(String response){
         int i = 1;
         this.logger.debug("Reception of the mails from the server");
+        this.messageReceived = new ArrayList<String>();
         int numberOfMessages = ((StateTransaction)this.currentState).analyseNumberOfMessages(response);
+
         String toSend = this.currentState.getMsgToSend();
         while(toSend != null){
             try {
@@ -200,14 +202,19 @@ public class Client extends Observable implements Runnable {
 
                 /*Will cut the string because we receive two parts: OK number_of_octets + the mail*/
                 int endFirstMessage = messageReceived.indexOf('\n');
-                String mailReceived = messageReceived.substring(0, endFirstMessage);
+                if(endFirstMessage > 0){
+                    String mailReceived = messageReceived.substring(0, endFirstMessage);
+                    /* TODO ajouter les mails à l'utilisateur */
 
-                /* TODO ajouter les mails à l'utilisateur */
-
-                this.newMessageToShow(mailReceived);
-                this.logger.debug("Reception of message " + i);
-                toSend = this.currentState.getMsgToSend();
-                i++;
+                    this.newMessageToShow(mailReceived);
+                    this.logger.debug("Reception of message " + i);
+                    toSend = this.currentState.getMsgToSend();
+                    i++;
+                }
+                else{
+                    this.logger.error("Error in the message " + i + " from the server");
+                    this.showError("Erreur lors de la transmission du mail " + i + " par le serveur");
+                }
             }
             catch (IOException e) {
                 this.logger.error("Cannot send RETR message to the server");
@@ -256,6 +263,8 @@ public class Client extends Observable implements Runnable {
             this.currentState = null;
             this.errorOccurred = false;
             this.lastErrorMessage = null;
+            this.mailManager = null;
+            this.messageReceived = null;
 
             //Call to the garbage collector
             System.gc();
