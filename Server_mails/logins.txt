@@ -1,4 +1,2 @@
-antoine@a.a caron
-adrien@a.a licorne
-pierre@a.a pierre
-dimitri@a.a dimitri
+a.caron@test.com acaron
+a.chaussende@test.com achaussende
