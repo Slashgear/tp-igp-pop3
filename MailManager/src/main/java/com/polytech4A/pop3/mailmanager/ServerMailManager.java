@@ -32,11 +32,12 @@ public class ServerMailManager extends MailManager {
      */
     @Override
     public User initUser(String login, String password) {
-        User user = new User(login, password, path);
-        if (isLockedUser(user)) {
-            user.lockUser();
-            user.initMails();
-            return user;
+        for(User u:users){
+            if(u.getLogin().equals(login)){
+                User user=u;
+                  return user;
+
+            }
         }
         return null;
     }
@@ -63,7 +64,7 @@ public class ServerMailManager extends MailManager {
      * @return true if the user is locked
      */
     public boolean isLockedUser(User user) {
-        return users.contains(user) && !user.isLocked();
+        return (users.contains(user)&&user.isLocked());
     }
 
     /**
@@ -85,7 +86,11 @@ public class ServerMailManager extends MailManager {
      * @return True if user successfully log in.
      */
     public boolean isUserExists(String login, String password) {
-        User user = new User(login, password, path);
-        return isLockedUser(user);
+        for(User u:users){
+            if(u.getLogin().equals(login)&&u.getPassword().equals(password)){
+                return true;
+            }
+        }
+        return false;
     }
 }
