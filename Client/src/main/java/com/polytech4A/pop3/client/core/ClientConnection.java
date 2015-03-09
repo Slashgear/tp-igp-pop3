@@ -115,9 +115,11 @@ public class ClientConnection{
             }
 
             if(expired[0]){
+                this.logger.error("Connexion expired");
                 throw new Exception("Connexion expired");
             }
         } catch (IOException e) {
+            this.logger.error(e.getMessage());
             throw e;
         }
 

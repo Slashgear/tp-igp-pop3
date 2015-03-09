@@ -107,7 +107,7 @@ public class Client extends Observable implements Runnable {
      * Wait for the first message of the server
      */
     public void waitFirstMessage(){
-        System.out.println("Waiting for first message");
+        this.logger.debug("Waiting for first message");
         try {
             String response = this.connection.waitForResponse();
             if(this.currentState.analyze(response)){
@@ -129,6 +129,7 @@ public class Client extends Observable implements Runnable {
      * @param password String that will contain the password of the user
      */
     public void makeAuthentication(String user, String password){
+        this.logger.debug("Attempt to authenticate");
         if(this.currentState instanceof StateAuthentication){
             String response;
             try {
@@ -164,6 +165,8 @@ public class Client extends Observable implements Runnable {
      * @param response Apop message which different parameters which need to be parse
      */
     private void receiveMessages(String response){
+        int i = 1;
+        this.logger.debug("Reception of the mails from the server");
         ((StateTransaction)this.currentState).analyseNumberOfMessages(response);
         String toSend = this.currentState.getMsgToSend();
         while(toSend != null){
@@ -172,7 +175,9 @@ public class Client extends Observable implements Runnable {
                 String messageReceived = this.connection.waitForResponse();
                 //TODO Treatment to do on this received message
                 this.newMessageToShow(messageReceived);
+                this.logger.debug("Reception of message " + i);
                 toSend = this.currentState.getMsgToSend();
+                i++;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -188,6 +193,8 @@ public class Client extends Observable implements Runnable {
      * We close the connection after that
      */
     private void askForCloseConnection(){
+        this.logger.debug("Asking for closing the connection");
+
         String toSend = this.currentState.getMsgToSend();
 
         try {
@@ -216,6 +223,8 @@ public class Client extends Observable implements Runnable {
 
             //Call to the garbage collector
             System.gc();
+
+            this.logger.debug("Connection closed");
         } catch (IOException e) {
             logger.error(e.getMessage());
             this.showError(e.getMessage());
@@ -233,6 +242,7 @@ public class Client extends Observable implements Runnable {
      * Allow the transition between states if the required conditions are OK
      */
     private void processing(){
+        //TODO Remove that because it's useless
         String response = null;
         try {
             response = this.connection.waitForResponse();
