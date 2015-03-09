@@ -5,6 +5,7 @@ import com.polytech4A.pop3.client.core.state.StateAuthentication;
 import com.polytech4A.pop3.client.core.state.StateStarted;
 import com.polytech4A.pop3.client.core.state.StateTransaction;
 import com.polytech4A.pop3.mailmanager.ClientMailManager;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -17,6 +18,7 @@ import java.util.regex.Pattern;
  * Main class for the client
  */
 public class Client extends Observable implements Runnable {
+    private static Logger logger = Logger.getLogger(ClientMain.class);
 
     private ClientConnection connection;
     private State currentState;
@@ -61,6 +63,7 @@ public class Client extends Observable implements Runnable {
      * Call the update of what must be show in the view
      */
     private void updateObservers() {
+        this.logger.debug("Asking for the update of the view");
         setChanged();
         notifyObservers();
     }
@@ -84,15 +87,37 @@ public class Client extends Observable implements Runnable {
             try {
                 // TODO Delete les system.out.println
                 address = InetAddress.getByName(addressString);
-                System.out.println("Etablissement de la connexion");
-                System.out.println(address);
+
+                logger.info("Etablissement de la connexion");
                 this.connection = new ClientConnection(address, port);
-                System.out.println("Connexion établie");
+                logger.info("Connexion établie");
                 this.currentState = new StateStarted();
-                this.processing();
+                this.waitFirstMessage();
+                //TODO add something
+                this.updateObservers();
             } catch (Exception e) {
+                logger.error(e.getMessage());
                 this.showError(e.getMessage());
             }
+        }
+    }
+
+
+    /**
+     * Wait for the first message of the server
+     */
+    public void waitFirstMessage(){
+        this.logger.debug("Waiting for first message");
+        try {
+            String response = this.connection.waitForResponse();
+            if(this.currentState.analyze(response)){
+                this.currentState.action();
+                this.currentState = this.currentState.getNextState();
+                this.updateObservers();
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            this.showError(e.getMessage());
         }
     }
 
@@ -104,6 +129,7 @@ public class Client extends Observable implements Runnable {
      * @param password String that will contain the password of the user
      */
     public void makeAuthentication(String user, String password){
+        this.logger.debug("Attempt to authenticate");
         if(this.currentState instanceof StateAuthentication){
             String response;
             try {
@@ -127,6 +153,7 @@ public class Client extends Observable implements Runnable {
                     }
                 }
             } catch (Exception e) {
+                logger.error(e.getMessage());
                 this.showError(e.getMessage());
             }
         }
@@ -138,6 +165,8 @@ public class Client extends Observable implements Runnable {
      * @param response Apop message which different parameters which need to be parse
      */
     private void receiveMessages(String response){
+        int i = 1;
+        this.logger.debug("Reception of the mails from the server");
         ((StateTransaction)this.currentState).analyseNumberOfMessages(response);
         String toSend = this.currentState.getMsgToSend();
         while(toSend != null){
@@ -146,7 +175,9 @@ public class Client extends Observable implements Runnable {
                 String messageReceived = this.connection.waitForResponse();
                 //TODO Treatment to do on this received message
                 this.newMessageToShow(messageReceived);
+                this.logger.debug("Reception of message " + i);
                 toSend = this.currentState.getMsgToSend();
+                i++;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -162,6 +193,8 @@ public class Client extends Observable implements Runnable {
      * We close the connection after that
      */
     private void askForCloseConnection(){
+        this.logger.debug("Asking for closing the connection");
+
         String toSend = this.currentState.getMsgToSend();
 
         try {
@@ -190,7 +223,10 @@ public class Client extends Observable implements Runnable {
 
             //Call to the garbage collector
             System.gc();
+
+            this.logger.debug("Connection closed");
         } catch (IOException e) {
+            logger.error(e.getMessage());
             this.showError(e.getMessage());
         }
     }
@@ -206,6 +242,7 @@ public class Client extends Observable implements Runnable {
      * Allow the transition between states if the required conditions are OK
      */
     private void processing(){
+        //TODO Remove that because it's useless
         String response = null;
         try {
             response = this.connection.waitForResponse();
@@ -221,8 +258,7 @@ public class Client extends Observable implements Runnable {
             }
         }
         else{
-            //retry or send error
-            System.out.println("Erreur");
+            logger.error("");
         }
     }
 

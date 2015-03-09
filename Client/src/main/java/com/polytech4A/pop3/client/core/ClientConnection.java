@@ -1,5 +1,7 @@
 package com.polytech4A.pop3.client.core;
 
+import org.apache.log4j.Logger;
+
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -10,6 +12,8 @@ import java.util.TimerTask;
  * Connection class for the client
  */
 public class ClientConnection{
+    private static Logger logger = Logger.getLogger(ClientMain.class);
+
     /**
      * Timeout in seconds
      */
@@ -111,14 +115,15 @@ public class ClientConnection{
             }
 
             if(expired[0]){
+                this.logger.error("Connexion expired");
                 throw new Exception("Connexion expired");
             }
         } catch (IOException e) {
+            this.logger.error(e.getMessage());
             throw e;
         }
 
-        //TODO remove that
-        System.out.println(response.toString());
+        this.logger.debug(response.toString());
         return response.toString();
     }
 }
