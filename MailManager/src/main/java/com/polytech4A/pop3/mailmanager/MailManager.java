@@ -74,7 +74,7 @@ public abstract class MailManager {
      * Get the list of Users in a directory
      * @return list of Users
      */
-    private void getUsers(){
+    protected void getUsers(){
         this.users = new ArrayList<User>();
         try{
             BufferedReader br=new BufferedReader(new InputStreamReader(new FileInputStream(path + "logins.txt")));
