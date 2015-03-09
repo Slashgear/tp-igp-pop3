@@ -90,7 +90,7 @@ public class Connection implements Runnable {
                 //TODO : Something like while(message = in.readLine() != null && timer)
                 logger.info("Waiting for a message from client.");
                 message = in.readLine();
-                System.out.println("Message = \n" + message);
+                logger.info("Client : " + message);
                 if (runConnection = state.analyze(message, manager)) { //route the request to next state of the server
                     updateState();
                     sendMessage();
@@ -125,8 +125,9 @@ public class Connection implements Runnable {
      */
     public void sendMessage() {
         try {
-            System.out.println(state.getMsgToSend());
+            logger.info("Server : "+state.getMsgToSend());
             out.write(state.getMsgToSend().getBytes());
+            out.flush();
         } catch (IOException e) {
             logger.error("Error during writing through server output\n" + e.getMessage());
         }
