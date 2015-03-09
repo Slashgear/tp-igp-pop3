@@ -8,18 +8,13 @@ import com.polytech4A.pop3.mailmanager.Exceptions.MalFormedMailException;
  *          <p/>
  *          Mails exchanged for POP3.
  */
-public class Mail {
+public class Mail extends MailParameter {
 
     /**
      * Header part of the mail.
      *  Concatenation of the subject, the sending Date, the recipient and the sender of the mail
      */
-    public Header header;
-
-    /**
-     * Content of the mail
-     */
-    private String content;
+    private Header header;
 
     /**
      * String that contains the mail that will be send.
@@ -47,38 +42,41 @@ public class Mail {
      * Constructor of the Mail.
      */
     public Mail(String receiver, String sender, String content, String subject) {
+        super("", MailParameter.END_LINE+ MailParameter.END_LINE);
         this.header=new Header(receiver, sender,subject);
         this.content = content;
-        this.output = new StringBuffer();
-        buildMail();
+        this.output = buildParameter();
     }
 
     public Mail(String input) throws MalFormedMailException{
-        String [] parsedContent = match (input, Header.END_LINE+Header.END_LINE);
-        if (parsedContent != null){
-            if (header.parseHeader(new StringBuffer(parsedContent[0]))){
-                content =parsedContent[1];
+        super(input, MailParameter.END_LINE+ MailParameter.END_LINE);
+        if (!parseParameter (input)){
+            throw new MalFormedMailException("Mail Header MalFormed : expected parameters TO, FROM, SUBJECT, ORIG-DATE");
+        }
+    }
+
+    @Override
+    public StringBuffer buildParameter (){
+        StringBuffer res = new StringBuffer(header.buildHeader());
+        res.append(parseLine(content));
+        return res.append(MailParameter.END_LINE);
+    }
+
+    @Override
+    public boolean parseParameter (String output){
+        String [] tamp;
+        if (output.contains(parser)){
+            tamp = output.split(parser);
+            try {
+                header = new Header (tamp[0]);
+            }catch (MalFormedMailException ex){
+                System.out.println("Mail.parseParameter : Failed to parse header : " + ex.getMessage());
+                return false;
             }
-            else throw new MalFormedMailException("Mail Header MalFormed : expected parameters TO, FROM, SUBJECT, ORIG-DATE");
+            content = tamp[1];
+            return true;
         }
-    }
-
-    /**
-     * Build the mail class in concatenating the data
-     */
-    public void buildMail (){
-        header.buildHeader();
-        output.append(header.getOutput());
-        output.append(Header.parseLine(content));
-        output.append(Header.END_LINE);
-    }
-
-    public String[] match (String input, String parser){
-        if (input.contains(parser)){
-            return input.split(parser);
-
-        }
-        else return null;
+        else return false;
     }
 
 

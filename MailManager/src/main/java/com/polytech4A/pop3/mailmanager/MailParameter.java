@@ -17,18 +17,18 @@ public abstract class MailParameter {
      */
     protected static final int MAX_LINE_LENGTH=78;
 
-    private String content;
-    private String id;
+    protected String content;
+    protected String parser;
 
-    public MailParameter(String content, String id){
+    public MailParameter(String content, String parser){
         this.content = content;
-        this.id = id;
+        this.parser = parser;
     }
 
-    public boolean parseParameter(StringBuffer output){
+    public boolean parseParameter(String output){
         String[] tamp;
-        if (Pattern.matches(id + "\\S" + END_LINE, output)){
-            tamp=output.toString().split(id);
+        if (Pattern.matches(parser + "\\S" + END_LINE, output)){
+            tamp=output.split(parser);
             tamp= tamp[1].split(END_LINE);
             content= tamp[0];
             return true;
@@ -36,8 +36,8 @@ public abstract class MailParameter {
         else return false;
     }
 
-    public StringBuffer buildParameter(StringBuffer output){
-        output.append(id);
+    public StringBuffer buildParameter(){
+        StringBuffer output = new StringBuffer(parser);
         output.append(parseLine(content));
         return output;
     }

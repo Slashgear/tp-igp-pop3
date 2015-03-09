@@ -4,7 +4,6 @@ import com.polytech4A.pop3.mailmanager.Exceptions.MalFormedMailException;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Scanner;
 
 /**
@@ -14,26 +13,26 @@ import java.util.Scanner;
  *          <p/>
  *          Users for POP3.
  */
-public class User {
+public abstract class User {
 
     /**
      * Login of the User
      */
-    private String login;
+    protected String login;
 
     /**
      * Password of the User
      */
-    private String password;
+    protected String password;
 
     /**
      * List of Mails of the User
      */
-    private ArrayList<Mail> mails;
+    protected ArrayList<Mail> mails;
     /**
      * Path to the User's directory
      */
-    private String path;
+    protected String path;
 
     /**
      * Constructor of the User
@@ -80,66 +79,6 @@ public class User {
      */
     public void deleteMail(Mail mail) {
         mails.remove(mail);
-    }
-
-    /**
-     * Check if the User is locked
-     *
-     * @return true if the User is locked
-     */
-    public boolean isLocked() {
-        File f = new File(path + "/lock.txt");
-        return f.exists() && !f.isDirectory();
-    }
-
-    /**
-     * Lock the User's directory to prevent multi-access if possible
-     *
-     * @return true the user can be locked
-     */
-    public boolean lockUser() {
-        File f = new File(path + "/lock.txt");
-        if (!f.exists() && !f.isDirectory()) {
-            try {
-                return f.createNewFile();
-            } catch (IOException e) {
-                System.out.println("User.lockUser : Can't create file : " + path + "/lock.txt");
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Unlock the User's directory
-     *
-     * @return true if the user has been unlocked
-     */
-    public boolean unlockUser() {
-        File f = new File(path + "/lock.txt");
-        if (f.exists() && !f.isDirectory()) {
-            if (f.delete()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Save the User's mails into its directory
-     */
-    public void saveMails() {
-        Date date = new Date();
-
-        try {
-            BufferedWriter file = new BufferedWriter(new FileWriter(path + "/mails_" + date.toString() + ".txt", true));
-            for (Mail mail : mails) {
-                file.write(mail.getOutput().toString());
-                file.newLine();
-            }
-            file.close();
-        } catch (IOException e) {
-            System.out.println("User.saveMail : Can't create file : " + path + "/mails_" + date.toString() + ".txt");
-        }
     }
 
     /**

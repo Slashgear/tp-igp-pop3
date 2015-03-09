@@ -19,11 +19,6 @@ public abstract class MailManager {
     protected String path;
 
     /**
-     * List of users of the MailManager
-     */
-    protected ArrayList<User> users;
-
-    /**
      * Initialize the MailManager's directory
      */
     protected void initDirectory() throws MailManagerException {
@@ -49,41 +44,8 @@ public abstract class MailManager {
     /**
      * Constructor of the MailManager
      */
-    protected MailManager (){
-        users = new ArrayList<User>();
-        path = "";
-    }
-
-    /**
-     * Initialize a MailManager's user
-     * @param login : String of the user's login
-     * @param password : String of the user's password
-     * @return Initialized user.
-     */
-    protected abstract User initUser (String login, String password);
-
-
-    /**
-     * Get the list of Users in a directory
-     * @return list of Users
-     */
-    public ArrayList<User> getUsers(){
-        ArrayList<User> users = new ArrayList<User>();
-        try{
-            BufferedReader br=new BufferedReader(new InputStreamReader(new FileInputStream(path + "logins.txt")));
-            String line;
-            String[] identification;
-
-            while ((line=br.readLine())!=null){
-                identification=line.split(" ");
-                users.add(new User(identification[0],identification[1], path));
-            }
-            br.close();
-        }
-        catch (IOException e) {
-            MailManagerException ex = new MailManagerException("User.getUser : Can't open file : "+path+"logins.txt");
-            System.out.println(ex.getMessage());
-        }
-        return users;
+    protected MailManager (String path) throws MailManagerException{
+        this.path = path;
+        initDirectory();
     }
 }

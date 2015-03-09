@@ -11,61 +11,47 @@ import com.polytech4A.pop3.mailmanager.Exceptions.MailManagerException;
  */
 public class ClientMailManager extends MailManager {
 
+    UserClient user;
+
     /**
      * Constructor of the ClientMailManager
      *
-     * @param login
+     * @param login Client login
+     * @param path Client directory path
      */
-    public ClientMailManager(String login) {
-        super();
-        try {
-            path = "Client/";
-            initDirectory();
-            initUser(login, "");
-        } catch (MailManagerException e) {
-            System.out.println(e.getMessage());
-        }
+    public ClientMailManager(String login, String path) throws MailManagerException{
+        super(path);
+        user = new UserClient(login,path);
+        user.initMails();
     }
 
     /**
      * Create a pop3 mail to be send by the client
      *
-     * @param receiver
-     * @param content
-     * @param subject
+     * @param receiver Mail receiver
+     * @param content Mail sender
+     * @param subject Mail subject
      * @return
      */
     public String createMail(String receiver, String content, String subject) {
-        return users.get(0).createMail(receiver, content, subject);
+        return user.createMail(receiver, content, subject);
     }
 
     /**
      * Save the client's mails
      */
     public void saveMails() {
-        users.get(0).saveMails();
+        user.saveMails();
     }
 
     /**
      * Check if a string is a valid pop3 mail to
      * Add it to the client's mails List
      *
-     * @param mail
+     * @param mail : Mail to check
      * @return
      */
     public boolean addMail(String mail) {
-        return users.get(0).addMail(mail);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public User initUser(String login, String password) {
-        User user = new User(login, password, path);
-        //if you uncomment the line below, the program will search for the registered user's mails
-        //user.initMails();
-        users.add(user);
-        return user;
+        return user.addMail(mail);
     }
 }

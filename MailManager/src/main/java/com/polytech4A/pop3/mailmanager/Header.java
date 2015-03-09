@@ -1,7 +1,9 @@
 package com.polytech4A.pop3.mailmanager;
 
+import com.polytech4A.pop3.mailmanager.Exceptions.MalFormedMailException;
+
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.regex.Pattern;
 
 /**
  * Created by Dimitri on 04/03/2015.
@@ -12,202 +14,45 @@ import java.util.regex.Pattern;
 public class Header {
 
     /**
-     * linefeed for POP3 mails
-     */
-    public static final String END_LINE =System.getProperty("line.separator")+System.getProperty("line.separator");
-
-    /**
-     * Constant for the max number of characters per line
-     */
-    public static final int MAX_LINE_LENGTH=78;
-
-    /**
-     *  Receiver of the mail
-     */
-    private String receiver;
-
-    /**
-     * Sender of the mail
-     */
-    private String sender;
-
-    /**
-     * Subject of the mail
-     */
-    private String subject;
-
-    /**
-     * Date of sending
-     */
-    private Date sendingDate;
-
-    /**
      * String that contains the header that will be send.
      *  Concatenation of the subject, the sending Date, the recipient and the sender of the mail
      */
     private StringBuffer output;
 
-    /**
-     * Getter of Receiver.
-     *
-     * @return Receiver String.
-     */
-    public String getReciever() {
-        return receiver;
-    }
+    private ArrayList<MailParameter> parameters;
 
-    /**
-     * Getter of Sender.
-     *
-     * @return Sender String.
-     */
-    public String getSender() {
-        return sender;
-    }
-
-    /**
-     * Getter of Subject.
-     *
-     * @return Subject String.
-     */
-    public String getSubject() {
-        return subject;
-    }
-
-    /**
-     * Getter of SendingDate.
-     *
-     * @return SendingDate Date.
-     */
-    public Date getSendingDate() {
-        return sendingDate;
-    }
-
-    /**
-     * Getter of Output.
-     *
-     * @return Output String.
-     */
-    public StringBuffer getOutput(){
-        return output;
-    }
 
     public Header(String receiver, String sender, String subject) {
-        this.receiver = receiver;
-        this.sender = sender;
-        this.subject = subject;
+        parameters = new ArrayList<MailParameter>();
+        parameters.add(new MailParameterSender(sender));
+        parameters.add(new MailParameterReceiver(receiver));
+        parameters.add(new MailParameterSubject(subject));
     }
 
-    /**
-     * Check if the line has the right length
-     * @param line : line to test
-     * @return true if the line match the max number of characters
-     */
-    public static boolean checkLineLength(String line){
-        return line.length()<=MAX_LINE_LENGTH;
-    }
 
-    /**
-     * Parse a line to the regular expression for POP3
-     * @param line : line to parse
-     * @return line parsed
-     */
-    public static StringBuffer parseLine(String line) {
-        int i=0;
-        StringBuffer res=new StringBuffer();
-        while (!checkLineLength(line.substring(i))) {
-            res.append(line.substring(i,MAX_LINE_LENGTH));
-            res.append(END_LINE);
-            i+=MAX_LINE_LENGTH;
+    public Header (String input) throws MalFormedMailException{
+        parameters = new ArrayList<MailParameter>();
+        parameters.add(new MailParameterSender(""));
+        parameters.add(new MailParameterReceiver(""));
+        parameters.add(new MailParameterSubject(""));
+        parameters.add(new MailParameterDate(""));
+        output=new StringBuffer(input);
+        for (MailParameter param: parameters){
+            if(!param.parseParameter(output.toString()))
+                throw new MalFormedMailException("Header.Header(String input): The input string does not match the pop3 format for "+param.getClass().toString());
         }
-        res.append(line.substring(i));
-
-        return res.append(END_LINE);
-    }
-
-    /**
-     * Check if a line contains the Mail's receiver
-     * @return true if the line contains the receiver
-     */
-    public boolean parseReceiver(){
-        String[] tamp;
-        if (Pattern.matches("TO:\\S" + END_LINE, output)){
-            tamp=output.toString().split("TO:");
-            tamp= tamp[1].split(END_LINE);
-            receiver=tamp[0];
-            return true;
-        }
-        else return false;
-    }
-
-    /**
-     * Check if a line contains the Mail's sender
-     * @return true if the line contains the sender
-     */
-    public boolean parseSender(){
-        String[] tamp;
-        if (Pattern.matches("FROM:\\S"+END_LINE,output)){
-            tamp=output.toString().split("FROM:");
-            tamp= tamp[1].split(END_LINE);
-            sender=tamp[0];
-            return true;
-        }
-        else return false;
-    }
-
-    /**
-     * Check if a line contains the Mail's subject
-     * @return true if the line contains the subject
-     */
-    public boolean parseSubject(){
-        String[] tamp;
-        if (Pattern.matches("SUBJECT:\\S"+END_LINE,output)){
-            tamp=output.toString().split("SUBJECT:");
-            tamp= tamp[1].split(END_LINE);
-            subject=tamp[0];
-            return true;
-        }
-        else return false;
-    }
-
-    /**
-     * Check if a line contains the Mail's date
-     * @return true if the line contains the date
-     */
-    public boolean parseDate(){
-        String[] tamp;
-        if (Pattern.matches("ORIG-DATE:\\S"+END_LINE,output)){
-            tamp=output.toString().split("ORIG-DATE:");
-            tamp=tamp[1].split(END_LINE);
-            sendingDate= new Date(tamp[0]);
-            return true;
-        }
-        else return false;
-    }
-
-    /**
-     * Check if a line contains the Mail's header
-     * @return true if the line contains the header
-     */
-    public boolean parseHeader (StringBuffer header){
-        this.output=header;
-        return parseSender()&&parseReceiver()&&parseSubject()&&parseDate();
     }
 
     /**
      * Build the mail Header
      */
-    public void buildHeader(){
-        sendingDate=new Date();
-        output=new StringBuffer();
-        output.append("FROM:");
-        output.append(parseLine(sender));
-        output.append("TO:");
-        output.append(parseLine(receiver));
-        output.append("SUBJECT:");
-        output.append(parseLine(subject));
-        output.append("ORIG-DATE:");
-        output.append(parseLine(sendingDate.toString()));
-        output.append(END_LINE);
+    public StringBuffer buildHeader(){
+        parameters.add(new MailParameterDate(new Date().toString()));
+        for (MailParameter param : parameters){
+            param.buildParameter();
+            output.append(param.content);
+        }
+        output.append(MailParameter.END_LINE);
+        return output;
     }
 }

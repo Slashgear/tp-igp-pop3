@@ -2,6 +2,10 @@ package com.polytech4A.pop3.mailmanager;
 
 import com.polytech4A.pop3.mailmanager.Exceptions.MailManagerException;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 /**
@@ -14,44 +18,30 @@ import java.util.ArrayList;
 public class ServerMailManager extends MailManager {
 
     /**
+     * List of users of the MailManager
+     */
+    protected ArrayList<UserServer> users;
+
+    /**
      * Constructor of ServerMailManager
      */
-    public ServerMailManager(String path) {
-        super();
-        try {
-            this.path = path;
-            initDirectory();
-            users = getUsers();
-        } catch (MailManagerException e) {
-            System.out.println(e.getMessage());
-        }
+    public ServerMailManager(String path) throws MailManagerException{
+        super(path);
+        getUsers();
     }
 
     /**
-     * {@inheritDoc}
+     * Initialize a MailManager's user
+     * @param login : String of the user's login
+     * @param password : String of the user's password
+     * @return Initialized user.
      */
-    @Override
     public User initUser(String login, String password) {
-        User user = new User(login, password, path);
+        UserServer user = new UserServer(login, password, path);
         if (isLockedUser(user)) {
             user.lockUser();
             user.initMails();
             return user;
-        }
-        return null;
-    }
-
-    /**
-     * Get the list of mails of a ServerMailManager's user
-     *
-     * @param user : User
-     * @return List of mails
-     */
-    public ArrayList<Mail> getMails(User user) {
-        if (isLockedUser(user)) {
-            for (Mail mail : user.getMails()) {
-                user.deleteMail(mail);
-            }
         }
         return null;
     }
@@ -62,7 +52,7 @@ public class ServerMailManager extends MailManager {
      * @param user : User to test
      * @return true if the user is locked
      */
-    public boolean isLockedUser(User user) {
+    public boolean isLockedUser(UserServer user) {
         return users.contains(user) && !user.isLocked();
     }
 
@@ -71,7 +61,7 @@ public class ServerMailManager extends MailManager {
      *
      * @param user : User to unlock
      */
-    public void unlockUser(User user) {
+    public void unlockUser(UserServer user) {
         if (users.contains(user) && user.isLocked()) {
             user.unlockUser();
         }
@@ -85,7 +75,28 @@ public class ServerMailManager extends MailManager {
      * @return True if user successfully log in.
      */
     public boolean isUserExists(String login, String password) {
-        User user = new User(login, password, path);
+        UserServer user = new UserServer(login, password, path);
         return isLockedUser(user);
+    }
+
+    /**
+     * Get the list of Users in a directory
+     */
+    public void getUsers() throws MailManagerException{
+        this.users = new ArrayList<UserServer>();
+        try{
+            BufferedReader br=new BufferedReader(new InputStreamReader(new FileInputStream(path + "logins.txt")));
+            String line;
+            String[] identification;
+
+            while ((line=br.readLine())!=null){
+                identification=line.split(" ");
+                users.add(new UserServer(identification[0],identification[1], path));
+            }
+            br.close();
+        }
+        catch (IOException e) {
+            throw new MailManagerException("User.getUser : Can't open file : "+path+"logins.txt");
+        }
     }
 }
