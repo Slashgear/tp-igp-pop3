@@ -40,9 +40,10 @@ public class StateTransaction extends State {
     /**
      * Constructor of Transaction state of the server.
      */
-    public StateTransaction() {
+    public StateTransaction(User user) {
         super();
         this.deleteMsg = Server.DEL_MESSAGE;
+        this.user = user;
     }
 
     /**
@@ -59,7 +60,7 @@ public class StateTransaction extends State {
                 buf.append("\n");
                 buf.append(mail.getOutput().toString());
                 setMsgToSend(buf.toString());
-                setNextState(new StateTransaction());
+                setNextState(new StateTransaction(user));
                 return true;
             } else if (QuitMessage.matches(message)) {
                 setNextState(new StateInit());
@@ -69,6 +70,7 @@ public class StateTransaction extends State {
                     }
                 }
                 setMsgToSend(new SigningOffMessage(Server.SERVER_NAME, deleteMsg).toString());
+                user.unlockUser();
                 return false; //Return false to end connection.
             }
         } catch (MalFormedMessageException e) {

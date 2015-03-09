@@ -58,7 +58,6 @@ public abstract class MailManager {
      */
     protected MailManager (){
         path = "";
-        getUsers();
     }
 
     /**

@@ -85,7 +85,6 @@ public class Connection implements Runnable {
         while (runConnection) {
             StringBuffer message = new StringBuffer();
             try {
-                //TODO : Something like while(message = in.readLine() != null && timer)
                 logger.info("Waiting for a message from client.");
                 byte[] buf = new byte[124];
                 message.append(((char) in.read()));
