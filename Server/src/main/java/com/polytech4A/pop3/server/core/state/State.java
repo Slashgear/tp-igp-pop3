@@ -1,5 +1,7 @@
 package com.polytech4A.pop3.server.core.state;
 
+import com.polytech4A.pop3.mailmanager.ServerMailManager;
+
 /**
  * Created by Adrien on 02/03/2015.
  *
@@ -68,12 +70,6 @@ public abstract class State {
      *
      * @param message String
      */
-    public abstract boolean analyze(String message);
+    public abstract boolean analyze(String message, ServerMailManager manager);
 
-    /**
-     * Does the associated action of the State.
-     *
-     * @param message
-     */
-    public abstract void action(String message);
 }

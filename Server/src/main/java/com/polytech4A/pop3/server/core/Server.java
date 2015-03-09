@@ -19,8 +19,22 @@ public class Server {
     /**
      * Logger of the server.
      */
-    //TODO : Develop a local logger in file. And then in html page.
     private static Logger logger = Logger.getLogger(Server.class);
+
+    /**
+     * Path to server directory.
+     */
+    public static String SERVER_DIRECTORY = "Server/";
+
+    /**
+     * Server name to send to client.
+     */
+    public static String SERVER_NAME = "PolytechPOP3";
+
+    /**
+     * True if the server have to delete messages at the end of the session.
+     */
+    public static boolean DEL_MESSAGE;
 
     /**
      * Server's socket.
@@ -42,7 +56,8 @@ public class Server {
      * @param port          Server will listen on this port.
      * @param nbConnections Maximum number of connections allowed on the server.
      */
-    public Server(int port, int nbConnections) {
+    public Server(int port, int nbConnections, boolean delMessage) {
+        this.DEL_MESSAGE = delMessage;
         this.start(port, nbConnections);
     }
 
@@ -87,12 +102,14 @@ public class Server {
      */
     public void listen() {
         //TODO : Handle a better exit condition.
-        while (true) {
+        boolean listening = true;
+        while (listening) {
             try {
                 this.openConnection(this.socket.accept());
             } catch (IOException e) {
                 logger.error("Error during connection accepting");
                 logger.error(e.getMessage());
+                listening = false;
             }
         }
     }
