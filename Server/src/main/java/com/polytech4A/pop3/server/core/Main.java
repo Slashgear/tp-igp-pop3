@@ -1,8 +1,6 @@
 package com.polytech4A.pop3.server.core;
 
-import org.apache.log4j.DailyRollingFileAppender;
-import org.apache.log4j.HTMLLayout;
-import org.apache.log4j.Level;
+import org.apache.log4j.*;
 
 import java.io.IOException;
 
@@ -44,7 +42,11 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        ConsoleAppender ca=new ConsoleAppender();
+        ca.setLayout(new SimpleLayout());
+        ca.activateOptions();
         logger.addAppender(appender);
+        logger.addAppender(ca);
         logger.setLevel(Level.DEBUG);
     }
 }
