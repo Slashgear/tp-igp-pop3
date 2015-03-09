@@ -143,12 +143,20 @@ public class Client extends Observable implements Runnable {
                     this.receiveMessages(response);
                 }
                 else{
-                    if(((StateAuthentication) this.currentState).getNumberOfTries() > 2){
-                        this.showError("Nombre de tentatives dépassées");
-                        this.closeConnection();
-                    }
-                    else{
-                        this.showError("Erreur dans l'adresse mail ou le mot de passe");
+                    String errorReceived = ((StateAuthentication) this.currentState).getErrorReceived();
+                    if(errorReceived != null){
+                        /* There is an error we must know which one */
+                        if(errorReceived == "NoMailBoxErr"){
+                            this.showError("Erreur dans l'adresse mail ou le mot de passe");
+                        }
+                        if(errorReceived == "PermissionDeniedErr"){
+                            this.showError("Le nombre de tentative est dépassé");
+                            this.closeConnection();
+                        }
+                        if(errorReceived == "AlreadyLockedErrMessage"){
+                            this.showError("L'utilisateur est déjà connecté");
+                            this.closeConnection();
+                        }
                     }
                 }
             } catch (Exception e) {

@@ -88,27 +88,24 @@ public class ClientConnection {
      * Wait for the response from the server and send back the response with a string format
      */
     public String waitForResponse() throws Exception {
-        System.out.println("Pouet");
         StringBuilder response = new StringBuilder();
         try {
             /* We are going to wait until the response arrived or the timeout expired*/
-            final Boolean[] expired = {false};
             Timer timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    expired[0] = true;
+
                 }
             }, this.TIMEOUT * 1000);
+
+
             response.append(((char) in.read()));
             while (in.available() != 0) {
                 response.append(((char) in.read()));
             }
+
             logger.info("Server : "+response.toString());
-            if (expired[0]) {
-                this.logger.error("Connexion expired");
-                throw new Exception("Connexion expired");
-            }
         } catch (IOException e) {
             this.logger.error(e.getMessage());
             throw e;
