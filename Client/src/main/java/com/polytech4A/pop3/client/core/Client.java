@@ -89,10 +89,30 @@ public class Client extends Observable implements Runnable {
                 this.connection = new ClientConnection(address, port);
                 System.out.println("Connexion établie");
                 this.currentState = new StateStarted();
-                this.processing();
+                this.waitFirstMessage();
+                //TODO add something
+                this.updateObservers();
             } catch (Exception e) {
                 this.showError(e.getMessage());
             }
+        }
+    }
+
+
+    /**
+     * Wait for the first message of the server
+     */
+    public void waitFirstMessage(){
+        System.out.println("Waiting for first message");
+        try {
+            String response = this.connection.waitForResponse();
+            if(this.currentState.analyze(response)){
+                this.currentState.action();
+                this.currentState = this.currentState.getNextState();
+                this.updateObservers();
+            }
+        } catch (Exception e) {
+            this.showError(e.getMessage());
         }
     }
 
