@@ -48,7 +48,7 @@ public class StateTransaction extends State {
                 Mail mail = user.getMails().get(retr.getNoMessages());
                 StringBuffer buf = new StringBuffer("+OK ");
                 buf.append(mail.getOutput().toString().getBytes().length);
-                buf.append("/n");
+                buf.append("\n");
                 buf.append(mail.getOutput().toString());
                 setMsgToSend(buf.toString());
                 setNextState(new StateTransaction());

@@ -5,10 +5,7 @@ import com.polytech4A.pop3.server.core.state.State;
 import com.polytech4A.pop3.server.core.state.StateInit;
 import org.apache.log4j.Logger;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.Socket;
 
 /**
@@ -43,7 +40,7 @@ public class Connection implements Runnable {
     /**
      * Input stream incoming from the client.
      */
-    private BufferedReader in;
+    private BufferedInputStream in;
 
     /**
      * Mail manager for the server. Will handle interactions between server and files about client informations and mails.
@@ -58,7 +55,7 @@ public class Connection implements Runnable {
             this.socket = socket;
             this.state = new StateInit();
             this.out = new BufferedOutputStream(socket.getOutputStream());
-            this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            this.in = new BufferedInputStream(socket.getInputStream());
             this.manager = new ServerMailManager(Server.SERVER_DIRECTORY);
         } catch (IOException e) {
             logger.error("Error while creating the connection.");
@@ -79,31 +76,37 @@ public class Connection implements Runnable {
      */
     public void processing() {
         boolean runConnection = true;
+
         //Server is in init state. We have to send the first message and then update in authorization state.
         logger.info("Connection opened");
         sendMessage();
         updateState();
         logger.info("First message sent");
         while (runConnection) {
-            String message = "";
+            StringBuffer message = new StringBuffer();
             try {
                 //TODO : Something like while(message = in.readLine() != null && timer)
                 logger.info("Waiting for a message from client.");
-                message = in.readLine();
-                logger.info("Client : " + message);
-                if (runConnection = state.analyze(message, manager)) { //route the request to next state of the server
-                    updateState();
-                    sendMessage();
+                byte[] buf = new byte[124];
+                message.append(((char) in.read()));
+                while (in.available() != 0) {
+                    message.append(((char) in.read()));
                 }
+                logger.info("Client : " + message);
+                runConnection = state.analyze(message.toString(), manager); //route the request to next state of the server
+                sendMessage();
+                updateState();
+
             } catch (IOException e) {
                 logger.error("Can't read incoming input from client.\n" + e.getMessage());
                 runConnection = false;
             }
         }
         try {
-            logger.info("------------------------ Closing connection ------------------------");
+            logger.info("CLOSING CONNECTION ... ...");
             in.close();
             out.close();
+            logger.info("CONNECTION CLOSED");
         } catch (IOException e) {
             logger.error("Can't close streams\n" + e.getMessage());
         }
@@ -125,7 +128,7 @@ public class Connection implements Runnable {
      */
     public void sendMessage() {
         try {
-            logger.info("Server : "+state.getMsgToSend());
+            logger.info("Server : " + state.getMsgToSend());
             out.write(state.getMsgToSend().getBytes());
             out.flush();
         } catch (IOException e) {

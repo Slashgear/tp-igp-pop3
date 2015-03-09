@@ -28,8 +28,8 @@ public abstract class MailManager {
      */
     protected void initDirectory() throws MailManagerException {
         File userFolder = new File(path),
-                userMailFolder = new File(path+"Server_mails/"),
-                userLoginsFile = new File(path+"Server_mails/logins.txt");
+                userMailFolder = new File(path+"mails/"),
+                userLoginsFile = new File(path+"mails/logins.txt");
 
         if(userFolder.exists() && !userMailFolder.exists()) {
             try {
@@ -48,7 +48,7 @@ public abstract class MailManager {
         } catch (SecurityException se) {
             throw new MailManagerException("MailManager.initDirectory : Could not create folders at " + path);
         } catch (IOException e) {
-            throw new MailManagerException("MailManager.initDirectory : Could not create logins.txt at " + path + "Mails/");
+            throw new MailManagerException("MailManager.initDirectory : Could not create logins.txt at " + path + "mails/");
         }
         path+="Server_mails/";
     }

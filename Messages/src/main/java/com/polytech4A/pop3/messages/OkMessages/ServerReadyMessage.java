@@ -54,6 +54,7 @@ public class ServerReadyMessage extends OkMessage {
     private void construct() {
         this.message.append(" ");
         this.message.append(serverName);
+        this.message.append(" POP3 server ready");
     }
 
     /**
