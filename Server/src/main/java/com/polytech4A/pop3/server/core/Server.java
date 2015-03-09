@@ -70,7 +70,7 @@ public class Server {
     private void start(int port, int nbConnections) {
         try {
             this.socket = new ServerSocket(port, nbConnections);
-            logger.info("Starting serveur on port " + port + ".");
+            logger.info("Starting server on port " + port + ".");
         } catch (IOException e) {
             logger.error("Impossible to start server, port may " + port + " be busy");
             logger.error(e.getMessage());
@@ -102,7 +102,7 @@ public class Server {
      */
     public void listen() {
         boolean listening = true;
-        logger.info("------------------------ Server Listening ------------------------");
+        logger.info("LISTENING... ...");
         while (listening) {
             try {
                 this.openConnection(this.socket.accept());

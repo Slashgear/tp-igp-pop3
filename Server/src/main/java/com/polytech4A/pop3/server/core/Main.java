@@ -26,7 +26,7 @@ public class Main {
     public static void main(String[] args) {
         defineLogger();
         Server server = new Server(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Boolean.parseBoolean(args[2]));
-        logger.info("-----------------------Server started------------------------------------");
+        logger.info("SERVER STARTED");
         server.listen();
         server.close();
     }
