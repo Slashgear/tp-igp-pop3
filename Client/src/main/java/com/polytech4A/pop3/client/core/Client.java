@@ -139,7 +139,6 @@ public class Client extends Observable implements Runnable {
                 if(this.currentState.analyze(response)){
                     /* Addition of the mail manager */
                     this.mailManager = new ClientMailManager(user);
-                    this.connection.sendMessage(this.currentState.getMsgToSend());
                     this.currentState.action();
                     this.currentState = this.currentState.getNextState();
                     this.receiveMessages(response);
@@ -185,7 +184,19 @@ public class Client extends Observable implements Runnable {
         while(toSend != null){
             try {
                 this.connection.sendMessage(toSend);
-                String messageReceived = this.connection.waitForResponse();
+            }
+            catch (IOException e) {
+                this.logger.error("Cannot send RETR message to the server");
+                this.showError("Ne peut plus joindre le serveur");
+            }
+            finally {
+                String messageReceived = null;
+                try {
+                    messageReceived = this.connection.waitForResponse();
+                } catch (Exception e) {
+                    this.logger.error("Cannot receive message from the server");
+                    this.showError("Ne peut plus joindre le serveur");
+                }
 
                 /*Will cut the string because we receive two parts: OK number_of_octets + the mail*/
                 int endFirstMessage = messageReceived.indexOf('\n');
@@ -197,9 +208,8 @@ public class Client extends Observable implements Runnable {
                 this.logger.debug("Reception of message " + i);
                 toSend = this.currentState.getMsgToSend();
                 i++;
-            } catch (Exception e) {
-                e.printStackTrace();
             }
+
         }
         this.currentState.action();
         this.currentState = this.currentState.getNextState();
@@ -219,7 +229,7 @@ public class Client extends Observable implements Runnable {
         try {
             this.connection.sendMessage(toSend);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error for the sending of the QUIT message");
         }
         finally {
             this.currentState.getNextState();
