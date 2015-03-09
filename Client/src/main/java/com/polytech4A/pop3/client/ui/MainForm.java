@@ -13,17 +13,17 @@ import java.util.Observer;
  * Class for the main window of the client application
  */
 public class MainForm extends javax.swing.JFrame implements Observer {
-    private JPanel panel1;
-    private JPanel panel2;
+    private JPanel panelStart;
+    private JPanel panelAuthenticate;
     private JTextField AddressTextInput;
     private JTextField PortTextInput;
-    private JButton validerButton;
+    private JButton validerStartButton;
     private JTextField passwordTextInput;
-    private JButton validerButton1;
+    private JButton validerAuthenticateButton;
     private JTextField userTextInput;
-    private JPanel panel3;
+    private JPanel panelMail;
     private JEditorPane resultPanel;
-    private JButton closeButton;
+    private JButton closeConnectionButton;
 
     private JPanel currentPannel;
 
@@ -36,21 +36,21 @@ public class MainForm extends javax.swing.JFrame implements Observer {
         this.client = _client;
         this.initComponents();
 
-        validerButton.addActionListener(new java.awt.event.ActionListener() {
+        validerStartButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                validateButtonActionPerformed(evt);
+                validateButtonStartActionPerformed(evt);
             }
         });
 
-        validerButton1.addActionListener(new java.awt.event.ActionListener() {
+        validerAuthenticateButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                validateButton1ActionPerformed(evt);
+                validateButtonAuthenticateActionPerformed(evt);
             }
         });
 
-        closeButton.addActionListener(new java.awt.event.ActionListener() {
+        closeConnectionButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                closeButtonActionPerformed(evt);
+                closeConnectionButtonActionPerformed(evt);
             }
         });
     }
@@ -61,9 +61,9 @@ public class MainForm extends javax.swing.JFrame implements Observer {
      */
     public void initComponents(){
         this.setSize(400, 400);
-        this.panel1.setVisible(true);
-        this.add(panel1);
-        this.currentPannel = panel1;
+        this.panelStart.setVisible(true);
+        this.add(panelStart);
+        this.currentPannel = panelStart;
         this.AddressTextInput.setText("127.0.0.1");
         this.PortTextInput.setText("1010");
     }
@@ -73,7 +73,7 @@ public class MainForm extends javax.swing.JFrame implements Observer {
      * When a click on the button occurred, we call a connection request of the client
      * @param evt
      */
-    private void validateButtonActionPerformed(java.awt.event.ActionEvent evt){
+    private void validateButtonStartActionPerformed(java.awt.event.ActionEvent evt){
         if(!this.AddressTextInput.getText().equals("") && !this.PortTextInput.getText().equals("")){
             String address = this.AddressTextInput.getText();
             int port = Integer.parseInt(this.PortTextInput.getText());
@@ -87,7 +87,7 @@ public class MainForm extends javax.swing.JFrame implements Observer {
      * When a click on the button 1 occurred, we call an authentication request on the client
      * @param evt
      */
-    private void validateButton1ActionPerformed(java.awt.event.ActionEvent evt){
+    private void validateButtonAuthenticateActionPerformed(java.awt.event.ActionEvent evt){
         if(!this.userTextInput.getText().equals("") && !this.passwordTextInput.getText().equals("")){
             String user = this.userTextInput.getText();
             String password = this.passwordTextInput.getText();
@@ -102,13 +102,13 @@ public class MainForm extends javax.swing.JFrame implements Observer {
      * and go back to the first view
      * @param evt
      */
-    private void closeButtonActionPerformed(java.awt.event.ActionEvent evt){
+    private void closeConnectionButtonActionPerformed(java.awt.event.ActionEvent evt){
         this.client.closeConnection();
-        this.panel3.setVisible(false);
-        this.remove(panel3);
-        this.panel1.setVisible(true);
-        this.add(panel1);
-        this.currentPannel = panel1;
+        this.panelMail.setVisible(false);
+        this.remove(panelMail);
+        this.panelStart.setVisible(true);
+        this.add(panelStart);
+        this.currentPannel = panelStart;
     }
 
 
@@ -125,25 +125,25 @@ public class MainForm extends javax.swing.JFrame implements Observer {
             if(currentState == null){
                 this.currentPannel.setVisible(false);
                 this.remove(this.currentPannel);
-                this.panel1.setVisible(true);
-                this.add(panel1);
-                this.currentPannel = panel1;
+                this.panelStart.setVisible(true);
+                this.add(panelStart);
+                this.currentPannel = panelStart;
             }
 
             if(currentState instanceof StateAuthentication){
-                this.panel1.setVisible(false);
-                this.remove(panel1);
-                this.panel2.setVisible(true);
-                this.add(panel2);
-                this.currentPannel = panel2;
+                this.panelStart.setVisible(false);
+                this.remove(panelStart);
+                this.panelAuthenticate.setVisible(true);
+                this.add(panelAuthenticate);
+                this.currentPannel = panelAuthenticate;
             }
 
             if(currentState instanceof StateTransaction){
-                this.panel2.setVisible(false);
-                this.remove(panel2);
-                this.panel3.setVisible(true);
-                this.add(panel3);
-                this.currentPannel = panel3;
+                this.panelAuthenticate.setVisible(false);
+                this.remove(panelAuthenticate);
+                this.panelMail.setVisible(true);
+                this.add(panelMail);
+                this.currentPannel = panelMail;
 
                 //TODO Show all the messages received
                 this.resultPanel.setText(this.client.getMessageReceived().get(0));
