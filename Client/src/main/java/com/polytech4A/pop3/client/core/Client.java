@@ -5,6 +5,7 @@ import com.polytech4A.pop3.client.core.state.StateAuthentication;
 import com.polytech4A.pop3.client.core.state.StateStarted;
 import com.polytech4A.pop3.client.core.state.StateTransaction;
 import com.polytech4A.pop3.mailmanager.ClientMailManager;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -17,6 +18,7 @@ import java.util.regex.Pattern;
  * Main class for the client
  */
 public class Client extends Observable implements Runnable {
+    private static Logger logger = Logger.getLogger(ClientMain.class);
 
     private ClientConnection connection;
     private State currentState;
@@ -61,6 +63,7 @@ public class Client extends Observable implements Runnable {
      * Call the update of what must be show in the view
      */
     private void updateObservers() {
+        this.logger.debug("Asking for the update of the view");
         setChanged();
         notifyObservers();
     }
@@ -84,15 +87,16 @@ public class Client extends Observable implements Runnable {
             try {
                 // TODO Delete les system.out.println
                 address = InetAddress.getByName(addressString);
-                System.out.println("Etablissement de la connexion");
-                System.out.println(address);
+
+                logger.info("Etablissement de la connexion");
                 this.connection = new ClientConnection(address, port);
-                System.out.println("Connexion établie");
+                logger.info("Connexion établie");
                 this.currentState = new StateStarted();
                 this.waitFirstMessage();
                 //TODO add something
                 this.updateObservers();
             } catch (Exception e) {
+                logger.error(e.getMessage());
                 this.showError(e.getMessage());
             }
         }
@@ -112,6 +116,7 @@ public class Client extends Observable implements Runnable {
                 this.updateObservers();
             }
         } catch (Exception e) {
+            logger.error(e.getMessage());
             this.showError(e.getMessage());
         }
     }
@@ -147,6 +152,7 @@ public class Client extends Observable implements Runnable {
                     }
                 }
             } catch (Exception e) {
+                logger.error(e.getMessage());
                 this.showError(e.getMessage());
             }
         }
@@ -211,6 +217,7 @@ public class Client extends Observable implements Runnable {
             //Call to the garbage collector
             System.gc();
         } catch (IOException e) {
+            logger.error(e.getMessage());
             this.showError(e.getMessage());
         }
     }
@@ -241,8 +248,7 @@ public class Client extends Observable implements Runnable {
             }
         }
         else{
-            //retry or send error
-            System.out.println("Erreur");
+            logger.error("");
         }
     }
 
