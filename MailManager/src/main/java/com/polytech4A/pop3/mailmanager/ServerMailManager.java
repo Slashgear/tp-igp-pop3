@@ -34,7 +34,8 @@ public class ServerMailManager extends MailManager {
      * Initialize a MailManager's user
      * @param login : String of the user's login
      * @param password : String of the user's password
-     * @return Initialized user.
+     * @return Initialized user if user exists and is not locked.
+     *          return null else
      */
     public User initUser(String login, String password) {
         UserServer user = new UserServer(login, password, path);
