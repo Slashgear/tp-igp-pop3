@@ -117,6 +117,8 @@ public class ClientConnection{
             throw e;
         }
 
+        //TODO remove that
+        System.out.println(response.toString());
         return response.toString();
     }
 }

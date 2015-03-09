@@ -85,6 +85,7 @@ public class Client extends Observable implements Runnable {
                 // TODO Delete les system.out.println
                 address = InetAddress.getByName(addressString);
                 System.out.println("Etablissement de la connexion");
+                System.out.println(address);
                 this.connection = new ClientConnection(address, port);
                 System.out.println("Connexion établie");
                 this.currentState = new StateStarted();
