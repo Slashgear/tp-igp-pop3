@@ -24,7 +24,7 @@ public class Server {
     /**
      * Path to server directory.
      */
-    public static String SERVER_DIRECTORY = "Server/";
+    public static String SERVER_DIRECTORY = "./";
 
     /**
      * Server name to send to client.
