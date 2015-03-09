@@ -21,7 +21,7 @@ public class ServerMailManager extends MailManager {
         try {
             this.path = path;
             initDirectory();
-            users = getUsers();
+            getUsers();
         } catch (MailManagerException e) {
             System.out.println(e.getMessage());
         }
