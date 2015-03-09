@@ -59,6 +59,7 @@ public class User {
      * @return List of mails
      */
     public ArrayList<Mail> getMails() {
+        initMails();
         return mails;
     }
 
@@ -157,8 +158,8 @@ public class User {
         File folder = new File(path);
         try {
             for (File fileEntry : folder.listFiles()) {
-                if (!fileEntry.isDirectory()) {
-                    mails.add(new Mail(new Scanner(new File(fileEntry.getName())).useDelimiter("\\Z").next()));
+                if (!fileEntry.isDirectory()&& !fileEntry.getAbsolutePath().contains("lock")) {
+                    mails.add(new Mail(new Scanner(new File(fileEntry.getAbsolutePath())).useDelimiter("\\Z").next()));
                 }
             }
         } catch (FileNotFoundException e) {
