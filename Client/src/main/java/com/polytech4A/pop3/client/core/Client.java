@@ -88,15 +88,15 @@ public class Client extends Observable implements Runnable {
                 // TODO Delete les system.out.println
                 address = InetAddress.getByName(addressString);
 
-                logger.info("Etablissement de la connexion");
+                logger.info("Trying to connect");
                 this.connection = new ClientConnection(address, port);
-                logger.info("Connexion établie");
+                logger.info("Connection established");
                 this.currentState = new StateStarted();
                 this.waitFirstMessage();
                 this.updateObservers();
             } catch (Exception e) {
-                logger.error(e.getMessage());
-                this.showError(e.getMessage());
+                logger.error("Connection refused");
+                this.showError("Connexion refusée, vérifiez vos paramètres");
             }
         }
     }
@@ -115,8 +115,9 @@ public class Client extends Observable implements Runnable {
                 this.updateObservers();
             }
         } catch (Exception e) {
-            logger.error(e.getMessage());
-            this.showError(e.getMessage());
+            logger.error("Cannot receive the first message from the server");
+            this.showError("Ne reçoit pas la réponse du serveur");
+            this.closeConnection();
         }
     }
 
@@ -136,6 +137,7 @@ public class Client extends Observable implements Runnable {
                 this.connection.sendMessage(this.currentState.getMsgToSend());
                 response = this.connection.waitForResponse();
                 if(this.currentState.analyze(response)){
+                    /* Addition of the mail manager */
                     this.mailManager = new ClientMailManager(user);
                     this.connection.sendMessage(this.currentState.getMsgToSend());
                     this.currentState.action();
@@ -148,20 +150,24 @@ public class Client extends Observable implements Runnable {
                         /* There is an error we must know which one */
                         if(errorReceived == "NoMailBoxErr"){
                             this.showError("Erreur dans l'adresse mail ou le mot de passe");
+                            logger.error("Error from the server: NoMailBoxErr");
                         }
                         if(errorReceived == "PermissionDeniedErr"){
                             this.showError("Le nombre de tentative est dépassé");
+                            logger.error("Error from the server: PermissionDeniedErr");
                             this.closeConnection();
                         }
                         if(errorReceived == "AlreadyLockedErrMessage"){
                             this.showError("L'utilisateur est déjà connecté");
+                            logger.error("Error from the server: AlreadyLockedErrMessage");
                             this.closeConnection();
                         }
                     }
                 }
             } catch (Exception e) {
-                logger.error(e.getMessage());
-                this.showError(e.getMessage());
+                logger.error("Cannot send message of authentication");
+                this.showError("L'authentification n'a pas pu aboutir, veuillez vous reconnecter");
+                this.closeConnection();
             }
         }
     }
@@ -180,8 +186,14 @@ public class Client extends Observable implements Runnable {
             try {
                 this.connection.sendMessage(toSend);
                 String messageReceived = this.connection.waitForResponse();
-                //TODO Treatment to do on this received message
-                this.newMessageToShow(messageReceived);
+
+                /*Will cut the string because we receive two parts: OK number_of_octets + the mail*/
+                int endFirstMessage = messageReceived.indexOf('\n');
+                String mailReceived = messageReceived.substring(0, endFirstMessage);
+
+                /* TODO ajouter les mails à l'utilisateur */
+
+                this.newMessageToShow(mailReceived);
                 this.logger.debug("Reception of message " + i);
                 toSend = this.currentState.getMsgToSend();
                 i++;
@@ -231,10 +243,11 @@ public class Client extends Observable implements Runnable {
             //Call to the garbage collector
             System.gc();
 
+            this.updateObservers();
             this.logger.debug("Connection closed");
         } catch (IOException e) {
-            logger.error(e.getMessage());
-            this.showError(e.getMessage());
+            logger.error("Error during the closing of the connection");
+            this.showError("Erreur pendant la fermeture de la connexion");
         }
     }
 
@@ -250,7 +263,7 @@ public class Client extends Observable implements Runnable {
      */
     private void processing(){
         //TODO Remove that because it's useless
-        String response = null;
+        /*String response = null;
         try {
             response = this.connection.waitForResponse();
         } catch (Exception e) {
@@ -266,7 +279,7 @@ public class Client extends Observable implements Runnable {
         }
         else{
             logger.error("");
-        }
+        }*/
     }
 
 

@@ -6,6 +6,7 @@ import com.polytech4A.pop3.client.core.state.StateAuthentication;
 import com.polytech4A.pop3.client.core.state.StateTransaction;
 
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -146,7 +147,15 @@ public class MainForm extends javax.swing.JFrame implements Observer {
                 this.currentPannel = panelMail;
 
                 //TODO Show all the messages received
-                this.resultPanel.setText(this.client.getMessageReceived().get(0));
+                String finalString = "";
+                ArrayList<String> listOfMessage = this.client.getMessageReceived();
+
+
+                for(int i = 0; i < listOfMessage.size(); i++){
+                    finalString += this.client.getMessageReceived().get(i);
+                    finalString += "--------------------------------------";
+                }
+                this.resultPanel.setText(finalString);
             }
         }
     }

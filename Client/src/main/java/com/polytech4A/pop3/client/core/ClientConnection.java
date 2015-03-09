@@ -76,7 +76,7 @@ public class ClientConnection {
      */
     public void sendMessage(String message) throws IOException {
         try {
-            logger.info("Client : "+message);
+            logger.info("Client : " + message);
             this.out.write(message.getBytes());
             this.out.flush();
         } catch (IOException e) {
@@ -98,6 +98,7 @@ public class ClientConnection {
 
                 }
             }, this.TIMEOUT * 1000);
+            //TODO Timeout to put here
 
 
             response.append(((char) in.read()));
@@ -105,9 +106,9 @@ public class ClientConnection {
                 response.append(((char) in.read()));
             }
 
-            logger.info("Server : "+response.toString());
+            logger.info("Server : " + response.toString());
         } catch (IOException e) {
-            this.logger.error(e.getMessage());
+            this.logger.error("Error in the connection");
             throw e;
         }
         return response.toString();
