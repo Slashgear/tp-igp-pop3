@@ -11,7 +11,7 @@ import java.util.TimerTask;
 /**
  * Connection class for the client
  */
-public class ClientConnection{
+public class ClientConnection {
     private static Logger logger = Logger.getLogger(ClientMain.class);
 
     /**
@@ -20,10 +20,10 @@ public class ClientConnection{
     private static final int TIMEOUT = 5;
 
     private Socket socket;
-    private BufferedOutputStream bufferedOutputStream;
-    private BufferedInputStream bufferedInputStream;
+    private BufferedOutputStream out;
+    private BufferedInputStream in;
 
-    public ClientConnection(){
+    public ClientConnection() {
     }
 
     public ClientConnection(InetAddress address, int port) throws IOException {
@@ -34,28 +34,25 @@ public class ClientConnection{
         return socket;
     }
 
-    public BufferedOutputStream getBufferedOutputStream() {
-        return bufferedOutputStream;
+    public BufferedOutputStream getOut() {
+        return out;
     }
 
-    public BufferedInputStream getBufferedInputStream() {
-        return bufferedInputStream;
+    public BufferedInputStream getIn() {
+        return in;
     }
 
     /**
      * Initialise the connection with the server and different objects with it, like the input and output streams
      *
-     * @param port      Port of the server to reach
-     * @param address   IP Address of the server to reach
+     * @param port    Port of the server to reach
+     * @param address IP Address of the server to reach
      */
     private void createConnection(InetAddress address, int port) throws IOException {
         try {
             this.socket = new Socket(address, port);
-            InputStream inputStream = this.getSocket().getInputStream();
-            OutputStream outputStream = this.getSocket().getOutputStream();
-
-            this.bufferedOutputStream = new BufferedOutputStream(outputStream);
-            this.bufferedInputStream = new BufferedInputStream(inputStream);
+            this.out = new BufferedOutputStream(this.getSocket().getOutputStream());
+            this.in = new BufferedInputStream(this.getSocket().getInputStream());
 
         } catch (IOException e) {
             throw e;
@@ -79,8 +76,9 @@ public class ClientConnection{
      */
     public void sendMessage(String message) throws IOException {
         try {
-            this.bufferedOutputStream.write(message.getBytes());
-            this.bufferedOutputStream.flush();
+            logger.info("Client : "+message);
+            this.out.write(message.getBytes());
+            this.out.flush();
         } catch (IOException e) {
             throw e;
         }
@@ -91,12 +89,9 @@ public class ClientConnection{
      */
     public String waitForResponse() throws Exception {
         StringBuilder response = new StringBuilder();
-        BufferedInputStream bi = this.bufferedInputStream;
-
         try {
             /* We are going to wait until the response arrived or the timeout expired*/
             final Boolean[] expired = {false};
-
             Timer timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override
@@ -104,17 +99,12 @@ public class ClientConnection{
                     expired[0] = true;
                 }
             }, this.TIMEOUT * 1000);
-
-
-            while (bi.available()==0 || !expired[0]){
-
+            response.append(((char) in.read()));
+            while (in.available() != 0) {
+                response.append(((char) in.read()));
             }
-
-            while (bi.available() != 0) {
-                response.append((char) bi.read());
-            }
-
-            if(expired[0]){
+            logger.info("Server : "+response.toString());
+            if (expired[0]) {
                 this.logger.error("Connexion expired");
                 throw new Exception("Connexion expired");
             }
@@ -122,8 +112,6 @@ public class ClientConnection{
             this.logger.error(e.getMessage());
             throw e;
         }
-
-        this.logger.debug(response.toString());
         return response.toString();
     }
 }
