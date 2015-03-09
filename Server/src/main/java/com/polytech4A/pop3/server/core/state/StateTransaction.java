@@ -22,7 +22,6 @@ public class StateTransaction extends State {
     /**
      * True : Server deletes message(s). False : Server does not delete message(s).
      */
-    //TODO : remove it.
     private boolean deleteMsg;
 
     /**

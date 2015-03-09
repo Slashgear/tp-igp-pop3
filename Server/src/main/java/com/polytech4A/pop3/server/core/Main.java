@@ -27,7 +27,8 @@ public class Main {
      */
     public static void main(String[] args) {
         defineLogger();
-        Server server = new Server(110, 10, true);
+        Server server = new Server(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Boolean.parseBoolean(args[2]));
+        logger.info("-----------------------Server started------------------------------------");
         server.listen();
         server.close();
     }
@@ -39,7 +40,7 @@ public class Main {
         HTMLLayout layout = new HTMLLayout();
         DailyRollingFileAppender appender = null;
         try {
-            appender = new DailyRollingFileAppender(layout, "/Server_Log/log", "yyyy-MM-dd");
+            appender = new DailyRollingFileAppender(layout, "./Server_Log/log.html", "yyyy-MM-dd");
         } catch (IOException e) {
             e.printStackTrace();
         }

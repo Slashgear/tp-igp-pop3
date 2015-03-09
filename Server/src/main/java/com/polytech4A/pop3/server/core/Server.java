@@ -101,8 +101,8 @@ public class Server {
      * Starts the server process and open a connection when socket accepts a connection.
      */
     public void listen() {
-        //TODO : Handle a better exit condition.
         boolean listening = true;
+        logger.info("------------------------ Server Listening ------------------------");
         while (listening) {
             try {
                 this.openConnection(this.socket.accept());

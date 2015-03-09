@@ -80,13 +80,16 @@ public class Connection implements Runnable {
     public void processing() {
         boolean runConnection = true;
         //Server is in init state. We have to send the first message and then update in authorization state.
+        logger.info("Connection opened");
         sendMessage();
         updateState();
+        logger.info("First message sent");
         while (runConnection) {
             String message = "";
             try {
                 //TODO : Something like while(message = in.readLine() != null && timer)
                 message = in.readLine();
+                System.out.println("Message = \n" + message);
                 if (runConnection = state.analyze(message, manager)) { //route the request to next state of the server
                     updateState();
                     sendMessage();
@@ -97,6 +100,7 @@ public class Connection implements Runnable {
             }
         }
         try {
+            logger.info("------------------------ Closing connection ------------------------");
             in.close();
             out.close();
         } catch (IOException e) {
