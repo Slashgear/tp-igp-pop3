@@ -50,6 +50,7 @@ public class ClientConnection {
      */
     private void createConnection(InetAddress address, int port) throws IOException {
         this.socket = new Socket(address, port);
+        this.socket.setSoTimeout(this.TIMEOUT * 1000);
         this.out = new BufferedOutputStream(this.getSocket().getOutputStream());
         this.in = new BufferedInputStream(this.getSocket().getInputStream());
     }
@@ -74,29 +75,14 @@ public class ClientConnection {
     /**
      * Wait for the response from the server and send back the response with a string format
      */
-    public String waitForResponse() throws Exception {
+    public String waitForResponse() throws IOException {
         StringBuilder response = new StringBuilder();
-        try {
-            /* We are going to wait until the response arrived or the timeout expired*/
-            Timer timer = new Timer();
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-
-                }
-            }, this.TIMEOUT * 1000);
-            //TODO Timeout to put here
-
-
             response.append(((char) in.read()));
             while (in.available() != 0) {
                 response.append(((char) in.read()));
             }
 
             logger.info("Server : " + response.toString());
-        } catch (IOException e) {
-            this.logger.error(e.getMessage());
-        }
         return response.toString();
     }
 }

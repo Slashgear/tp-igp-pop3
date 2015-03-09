@@ -135,35 +135,41 @@ public class Client extends Observable implements Runnable {
             try {
                 ((StateAuthentication) this.currentState).setAuthenticationMessage(user, password);
                 this.connection.sendMessage(this.currentState.getMsgToSend());
-                response = this.connection.waitForResponse();
-                if(this.currentState.analyze(response)){
+                try {
+                    response = this.connection.waitForResponse();
+                    if (this.currentState.analyze(response)) {
                     /* Addition of the mail manager */
-                    this.mailManager = new ClientMailManager(user);
-                    this.currentState.action();
-                    this.currentState = this.currentState.getNextState();
-                    this.receiveMessages(response);
-                }
-                else{
-                    String errorReceived = ((StateAuthentication) this.currentState).getErrorReceived();
-                    if(errorReceived != null){
-                        /* There is an error we must know which one */
-                        if(errorReceived == "NoMailBoxErr"){
-                            this.showError("Erreur dans l'adresse mail ou le mot de passe");
-                            logger.error("Error from the server: NoMailBoxErr");
-                        }
-                        if(errorReceived == "PermissionDeniedErr"){
-                            this.showError("Le nombre de tentative est dépassé");
-                            logger.error("Error from the server: PermissionDeniedErr");
-                            this.closeConnection();
-                        }
-                        if(errorReceived == "AlreadyLockedErrMessage"){
-                            this.showError("L'utilisateur est déjà connecté");
-                            logger.error("Error from the server: AlreadyLockedErrMessage");
-                            this.closeConnection();
+                        this.mailManager = new ClientMailManager(user);
+                        this.currentState.action();
+                        this.currentState = this.currentState.getNextState();
+                        this.receiveMessages(response);
+                    } else {
+                        String errorReceived = ((StateAuthentication) this.currentState).getErrorReceived();
+                        if (errorReceived != null) {
+                        /* There is an error from the server: we must know which one it is*/
+                            if (errorReceived == "NoMailBoxErr") {
+                                this.showError("Erreur dans l'adresse mail ou le mot de passe");
+                                logger.error("Error from the server: NoMailBoxErr");
+                            }
+                            if (errorReceived == "PermissionDeniedErr") {
+                                this.showError("Le nombre de tentative est dépassé");
+                                logger.error("Error from the server: PermissionDeniedErr");
+                                this.closeConnection();
+                            }
+                            if (errorReceived == "AlreadyLockedErrMessage") {
+                                this.showError("L'utilisateur est déjà connecté");
+                                logger.error("Error from the server: AlreadyLockedErrMessage");
+                                this.closeConnection();
+                            }
                         }
                     }
                 }
-            } catch (Exception e) {
+                catch(IOException e){
+                    logger.error("Cannot receive confirmation of the message of authentication");
+                    this.showError("L'authentification n'a pas pu aboutir, veuillez vous reconnecter");
+                    this.closeConnection();
+                }
+            } catch (IOException e) {
                 logger.error("Cannot send message of authentication");
                 this.showError("L'authentification n'a pas pu aboutir, veuillez vous reconnecter");
                 this.closeConnection();
@@ -179,17 +185,11 @@ public class Client extends Observable implements Runnable {
     private void receiveMessages(String response){
         int i = 1;
         this.logger.debug("Reception of the mails from the server");
-        ((StateTransaction)this.currentState).analyseNumberOfMessages(response);
+        int numberOfMessages = ((StateTransaction)this.currentState).analyseNumberOfMessages(response);
         String toSend = this.currentState.getMsgToSend();
         while(toSend != null){
             try {
                 this.connection.sendMessage(toSend);
-            }
-            catch (IOException e) {
-                this.logger.error("Cannot send RETR message to the server");
-                this.showError("Ne peut plus joindre le serveur");
-            }
-            finally {
                 String messageReceived = null;
                 try {
                     messageReceived = this.connection.waitForResponse();
@@ -209,11 +209,18 @@ public class Client extends Observable implements Runnable {
                 toSend = this.currentState.getMsgToSend();
                 i++;
             }
-
+            catch (IOException e) {
+                this.logger.error("Cannot send RETR message to the server");
+                this.showError("Ne peut plus joindre le serveur");
+            }
         }
         this.currentState.action();
         this.currentState = this.currentState.getNextState();
         this.askForCloseConnection();
+
+        if(numberOfMessages == 0){
+            this.showError("Vous n'avez pas de nouveaux messages, vous êtes déconnecté");
+        }
     }
 
 

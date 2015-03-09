@@ -4,6 +4,7 @@ import com.polytech4A.pop3.client.core.Client;
 import com.polytech4A.pop3.client.core.state.State;
 import com.polytech4A.pop3.client.core.state.StateAuthentication;
 import com.polytech4A.pop3.client.core.state.StateTransaction;
+import com.polytech4A.pop3.client.core.state.StateWFClose;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -123,7 +124,7 @@ public class MainForm extends javax.swing.JFrame implements Observer {
 
             State currentState = ((Client) o).getCurrentState();
 
-            if(currentState == null){
+            if(currentState == null || currentState instanceof StateWFClose){
                 this.currentPannel.setVisible(false);
                 this.remove(this.currentPannel);
                 this.panelStart.setVisible(true);
@@ -150,9 +151,8 @@ public class MainForm extends javax.swing.JFrame implements Observer {
                 String finalString = "";
                 ArrayList<String> listOfMessage = this.client.getMessageReceived();
 
-
                 for(int i = 0; i < listOfMessage.size(); i++){
-                    finalString += this.client.getMessageReceived().get(i);
+                    finalString += listOfMessage.get(i);
                     finalString += "--------------------------------------";
                 }
                 this.resultPanel.setText(finalString);
