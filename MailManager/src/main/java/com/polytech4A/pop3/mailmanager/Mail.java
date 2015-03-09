@@ -54,13 +54,8 @@ public class Mail {
     }
 
     public Mail(String input) throws MalFormedMailException{
-        String [] parsedContent = match (input, Header.END_LINE+Header.END_LINE);
-        if (parsedContent != null){
-            if (header.parseHeader(new StringBuffer(parsedContent[0]))){
-                content =parsedContent[1];
-            }
-            else throw new MalFormedMailException("Mail Header MalFormed : expected parameters TO, FROM, SUBJECT, ORIG-DATE");
-        }
+        this.output = new StringBuffer();
+        output.append(input);
     }
 
     /**

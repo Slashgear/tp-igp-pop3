@@ -159,13 +159,24 @@ public class User {
         try {
             for (File fileEntry : folder.listFiles()) {
                 if (!fileEntry.isDirectory()&& !fileEntry.getAbsolutePath().contains("lock")) {
-                    mails.add(new Mail(new Scanner(new File(fileEntry.getAbsolutePath())).useDelimiter("\\Z").next()));
+                    BufferedInputStream in = new BufferedInputStream(new FileInputStream(new File(fileEntry.getAbsolutePath())));
+                    StringWriter out = new StringWriter();
+                    int b;
+                    while ((b=in.read()) != -1) {
+                        out.write(b);
+                    }
+                    out.flush();
+                    out.close();
+                    in.close();
+                    mails.add(new Mail(out.toString()));
                 }
             }
         } catch (FileNotFoundException e) {
             System.out.println("User.initMails : File in '" + path + "' not found");
         } catch (MalFormedMailException e) {
             System.out.println("User.InitMails : " + e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
