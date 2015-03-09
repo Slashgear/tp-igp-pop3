@@ -69,6 +69,7 @@ public class StateTransaction extends State {
                     }
                 }
                 setMsgToSend(new SigningOffMessage(Server.SERVER_NAME, deleteMsg).toString());
+                manager.unlockUser(user);
                 return false; //Return false to end connection.
             }
         } catch (MalFormedMessageException e) {

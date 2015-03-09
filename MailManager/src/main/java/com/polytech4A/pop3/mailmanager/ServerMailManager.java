@@ -2,6 +2,7 @@ package com.polytech4A.pop3.mailmanager;
 
 import com.polytech4A.pop3.mailmanager.Exceptions.MailManagerException;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -22,6 +23,12 @@ public class ServerMailManager extends MailManager {
             this.path = path;
             initDirectory();
             getUsers();
+            for (User user : users) {
+                File f = new File(this.path + user.getLogin());
+                if (!f.exists()) {
+                    f.mkdir();
+                }
+            }
         } catch (MailManagerException e) {
             System.out.println(e.getMessage());
         }
@@ -32,11 +39,10 @@ public class ServerMailManager extends MailManager {
      */
     @Override
     public User initUser(String login, String password) {
-        for(User u:users){
-            if(u.getLogin().equals(login)){
-                User user=u;
-                  return user;
-
+        for (User u : users) {
+            if (u.getLogin().equals(login)) {
+                User user = u;
+                return user;
             }
         }
         return null;
@@ -64,7 +70,7 @@ public class ServerMailManager extends MailManager {
      * @return true if the user is locked
      */
     public boolean isLockedUser(User user) {
-        return (users.contains(user)&&user.isLocked());
+        return (users.contains(user) && user.isLocked());
     }
 
     /**
@@ -86,8 +92,8 @@ public class ServerMailManager extends MailManager {
      * @return True if user successfully log in.
      */
     public boolean isUserExists(String login, String password) {
-        for(User u:users){
-            if(u.getLogin().equals(login)&&u.getPassword().equals(password)){
+        for (User u : users) {
+            if (u.getLogin().equals(login) && u.getPassword().equals(password)) {
                 return true;
             }
         }
