@@ -93,7 +93,6 @@ public class Client extends Observable implements Runnable {
                 logger.info("Connexion établie");
                 this.currentState = new StateStarted();
                 this.waitFirstMessage();
-                //TODO add something
                 this.updateObservers();
             } catch (Exception e) {
                 logger.error(e.getMessage());

@@ -90,6 +90,7 @@ public class ClientConnection{
      * Wait for the response from the server and send back the response with a string format
      */
     public String waitForResponse() throws Exception {
+        System.out.println("Pouet");
         StringBuilder response = new StringBuilder();
         BufferedInputStream bi = this.bufferedInputStream;
 
