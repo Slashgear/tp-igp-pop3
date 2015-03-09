@@ -28,22 +28,29 @@ public abstract class MailManager {
      */
     protected void initDirectory() throws MailManagerException {
         File userFolder = new File(path),
-                userMailFolder = new File(path+"Mails/"),
-                userLoginsFile = new File(path+"Mails/logins.txt");
+                userMailFolder = new File(path+"Server_mails/"),
+                userLoginsFile = new File(path+"Server_mails/logins.txt");
 
-        if (!userFolder.exists()) try {
+        if(userFolder.exists() && !userMailFolder.exists()) {
+            try {
+                if (!(userMailFolder.mkdir() && userLoginsFile.createNewFile())) {
+                    throw new MailManagerException("MailManager.initDirectory : Could not init directories at " + path);
+                }
+            } catch (SecurityException se) {
+                throw new MailManagerException("MailManager.initDirectory : Could not create folders at " + path);
+            } catch (IOException e) {
+                throw new MailManagerException("MailManager.initDirectory : Could not create logins.txt at " + userMailFolder.getPath());
+            }
+        } else if (!userFolder.exists() && !userMailFolder.exists()) try {
             if (!(userFolder.mkdir() && userMailFolder.mkdir() && userLoginsFile.createNewFile())) {
-                MailManagerException ex = new MailManagerException("MailManager.initDirectory : Could not init directories at " + path);
-                throw ex;
+                throw new MailManagerException("MailManager.initDirectory : Could not init directories at " + path);
             }
         } catch (SecurityException se) {
-            MailManagerException ex = new MailManagerException("MailManager.initDirectory : Could not create folders at " + path);
-            throw ex;
+            throw new MailManagerException("MailManager.initDirectory : Could not create folders at " + path);
         } catch (IOException e) {
-            MailManagerException ex = new MailManagerException("MailManager.initDirectory : Could not create logins.txt at " + path + "Mails/");
-            throw ex;
+            throw new MailManagerException("MailManager.initDirectory : Could not create logins.txt at " + path + "Mails/");
         }
-        path+="Mails/";
+        path+="Server_mails/";
     }
 
     /**
@@ -81,7 +88,7 @@ public abstract class MailManager {
             br.close();
         }
         catch (IOException e) {
-            MailManagerException ex = new MailManagerException("User.getUser : Can't open file : "+path+"logins.txt");
+            MailManagerException ex = new MailManagerException("MailManager.getUsers : Can't open file : "+path+"logins.txt");
             System.out.println(ex.getMessage());
         }
         return users;

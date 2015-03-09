@@ -64,6 +64,8 @@ public class MainForm extends javax.swing.JFrame implements Observer {
         this.panel1.setVisible(true);
         this.add(panel1);
         this.currentPannel = panel1;
+        this.AddressTextInput.setText("127.0.0.1");
+        this.PortTextInput.setText("1010");
     }
 
 
