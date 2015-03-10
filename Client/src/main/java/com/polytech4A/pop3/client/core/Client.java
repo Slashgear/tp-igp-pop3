@@ -220,28 +220,37 @@ public class Client extends Observable implements Runnable {
                 this.showError("Ne peut plus joindre le serveur");
             }
         }
+        this.askForCloseConnection();
 
-        if(numberOfMessages == 0){
+        if(numberOfMessages == 0) {
             this.showError("Vous n'avez pas de nouveaux messages, vous êtes déconnecté");
-            this.askForCloseConnection();
         }
     }
 
 
     /**
-     * After the reception of the last message, we send a last message to the server
-     * We close the connection after that
+     * After the reception of the last mail, we send a last message to the server
+     * we want to receive an OK message and we close the connection
      */
-    public void askForCloseConnection(){
+    private void askForCloseConnection(){
         this.logger.debug("Asking for closing the connection");
 
         this.currentState.action();
         this.currentState = this.currentState.getNextState();
-
         String toSend = this.currentState.getMsgToSend();
 
         try {
             this.connection.sendMessage(toSend);
+            try{
+                String response = this.connection.waitForResponse();
+                if(!this.currentState.analyze(response)){
+                    this.logger.error("No reception of OK message from the server after QUIT");
+                }
+            }
+            catch(IOException e){
+                this.logger.error("Timeout from the server");
+                this.showError("Timeout from the server");
+            }
         } catch (IOException e) {
             logger.error("Error for the sending of the QUIT message");
         }
@@ -255,7 +264,7 @@ public class Client extends Observable implements Runnable {
     /**
      * Will call the closing of the connection (call at the end or when an important error occurred)
      */
-    private void closeConnection(){
+    public void closeConnection(){
         try {
             this.connection.closeConnection();
             this.connection = null;

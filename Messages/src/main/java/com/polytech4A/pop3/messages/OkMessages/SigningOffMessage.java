@@ -75,7 +75,7 @@ public class SigningOffMessage extends OkMessage {
      * @return true/false.
      */
     public static boolean matches(String text) {
-        String regex = "^\\+OK \\S* POP3 server is signing off \\(maildrop \\S\\)$";
+        String regex = "^\\+OK \\S* POP3 server is signing off \\(maildrop \\S*\\)$";
         return Pattern.matches(regex, text);
     }
 }

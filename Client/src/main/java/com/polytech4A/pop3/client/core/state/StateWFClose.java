@@ -4,6 +4,7 @@ package com.polytech4A.pop3.client.core.state;
  * Created by Pierre on 07/03/2015.
  */
 
+import com.polytech4A.pop3.messages.OkMessages.SigningOffMessage;
 import com.polytech4A.pop3.messages.QuitMessage;
 
 /**
@@ -16,7 +17,9 @@ public class StateWFClose extends State{
 
     @Override
     public boolean analyze(String message) {
-        return false;
+        Boolean response = false;
+        response = SigningOffMessage.matches(message);
+        return response;
     }
 
     @Override
