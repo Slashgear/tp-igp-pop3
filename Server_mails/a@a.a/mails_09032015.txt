@@ -1,0 +1,9 @@
+FROM:a.chaussende@test.com
+TO:a@a
+SUBJECT:Test mail 1
+ORIG-DATE:8/03/2015 
+
+Bonjour,
+Ceci est le premier test d'envoi de mail
+A Chaussende
+

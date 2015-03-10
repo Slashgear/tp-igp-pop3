@@ -2,6 +2,9 @@ package com.polytech4A.pop3.mailmanager;
 
 import com.polytech4A.pop3.mailmanager.Exceptions.MailManagerException;
 
+import java.io.File;
+import java.io.IOException;
+
 /**
  * Created by Dimitri on 07/03/2015.
  *
@@ -19,12 +22,38 @@ public class ClientMailManager extends MailManager {
     public ClientMailManager(String login) {
         super();
         try {
-            path = "Client/";
+            path = "./";
             initDirectory();
             initUser(login, "");
         } catch (MailManagerException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void initDirectory() throws MailManagerException {
+        File userFolder = new File(path),
+                userMailFolder = new File(path+"Client_mails/");
+
+        if(userFolder.exists() && !userMailFolder.exists()) {
+            try {
+                if (!(userMailFolder.mkdir())) {
+                    throw new MailManagerException("MailManager.initDirectory : Could not init directories at " + path);
+                }
+            } catch (SecurityException se) {
+                throw new MailManagerException("MailManager.initDirectory : Could not create folders at " + path);
+            }
+        } else if (!userFolder.exists() && !userMailFolder.exists()) try {
+            if (!(userFolder.mkdir() && userMailFolder.mkdir())) {
+                throw new MailManagerException("MailManager.initDirectory : Could not init directories at " + path);
+            }
+        } catch (SecurityException se) {
+            throw new MailManagerException("MailManager.initDirectory : Could not create folders at " + path);
+        }
+        path+="Client_mails/";
     }
 
     /**
@@ -65,7 +94,7 @@ public class ClientMailManager extends MailManager {
         User user = new User(login, password, path);
         //if you uncomment the line below, the program will search for the registered user's mails
         //user.initMails();
-        users.add(user);
+        //users.add(user);
         return user;
     }
 }

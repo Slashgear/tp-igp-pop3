@@ -35,6 +35,14 @@ public class User {
      */
     private String path;
 
+    public String getPassword() {
+        return password;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
     /**
      * Constructor of the User
      */
@@ -51,6 +59,7 @@ public class User {
      * @return List of mails
      */
     public ArrayList<Mail> getMails() {
+        initMails();
         return mails;
     }
 
@@ -147,16 +156,28 @@ public class User {
      */
     public void initMails() {
         File folder = new File(path);
+        mails.clear();
         try {
             for (File fileEntry : folder.listFiles()) {
-                if (!fileEntry.isDirectory()) {
-                    mails.add(new Mail(new Scanner(new File(fileEntry.getName())).useDelimiter("\\Z").next()));
+                if (!fileEntry.isDirectory()&& !fileEntry.getAbsolutePath().contains("lock")) {
+                    BufferedInputStream in = new BufferedInputStream(new FileInputStream(new File(fileEntry.getAbsolutePath())));
+                    StringWriter out = new StringWriter();
+                    int b;
+                    while ((b=in.read()) != -1) {
+                        out.write(b);
+                    }
+                    out.flush();
+                    out.close();
+                    in.close();
+                    mails.add(new Mail(out.toString()));
                 }
             }
         } catch (FileNotFoundException e) {
             System.out.println("User.initMails : File in '" + path + "' not found");
         } catch (MalFormedMailException e) {
             System.out.println("User.InitMails : " + e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

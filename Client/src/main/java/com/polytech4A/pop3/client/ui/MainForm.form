@@ -176,7 +176,9 @@
                 <preferred-size width="150" height="50"/>
               </grid>
             </constraints>
-            <properties/>
+            <properties>
+              <autoscrolls value="false"/>
+            </properties>
           </component>
           <hspacer id="53bb5">
             <constraints>

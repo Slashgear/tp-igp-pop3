@@ -57,7 +57,6 @@ public abstract class MailManager {
      * Constructor of the MailManager
      */
     protected MailManager (){
-        users = new ArrayList<User>();
         path = "";
     }
 
@@ -74,8 +73,8 @@ public abstract class MailManager {
      * Get the list of Users in a directory
      * @return list of Users
      */
-    public ArrayList<User> getUsers(){
-        ArrayList<User> users = new ArrayList<User>();
+    protected void getUsers(){
+        this.users = new ArrayList<User>();
         try{
             BufferedReader br=new BufferedReader(new InputStreamReader(new FileInputStream(path + "logins.txt")));
             String line;
@@ -91,6 +90,5 @@ public abstract class MailManager {
             MailManagerException ex = new MailManagerException("MailManager.getUsers : Can't open file : "+path+"logins.txt");
             System.out.println(ex.getMessage());
         }
-        return users;
     }
 }

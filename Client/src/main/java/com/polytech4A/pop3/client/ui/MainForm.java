@@ -4,8 +4,10 @@ import com.polytech4A.pop3.client.core.Client;
 import com.polytech4A.pop3.client.core.state.State;
 import com.polytech4A.pop3.client.core.state.StateAuthentication;
 import com.polytech4A.pop3.client.core.state.StateTransaction;
+import com.polytech4A.pop3.client.core.state.StateWFClose;
 
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -24,6 +26,7 @@ public class MainForm extends javax.swing.JFrame implements Observer {
     private JPanel panelMail;
     private JEditorPane resultPanel;
     private JButton closeConnectionButton;
+    private JScrollPane scrollPanel;
 
     private JPanel currentPannel;
 
@@ -66,6 +69,7 @@ public class MainForm extends javax.swing.JFrame implements Observer {
         this.currentPannel = panelStart;
         this.AddressTextInput.setText("127.0.0.1");
         this.PortTextInput.setText("1010");
+        //this.scrollPanel = new JScrollPane(this.resultPanel);
     }
 
 
@@ -103,7 +107,7 @@ public class MainForm extends javax.swing.JFrame implements Observer {
      * @param evt
      */
     private void closeConnectionButtonActionPerformed(java.awt.event.ActionEvent evt){
-        this.client.closeConnection();
+        this.client.askForCloseConnection();
         this.panelMail.setVisible(false);
         this.remove(panelMail);
         this.panelStart.setVisible(true);
@@ -122,7 +126,7 @@ public class MainForm extends javax.swing.JFrame implements Observer {
 
             State currentState = ((Client) o).getCurrentState();
 
-            if(currentState == null){
+            if(currentState == null || currentState instanceof StateWFClose){
                 this.currentPannel.setVisible(false);
                 this.remove(this.currentPannel);
                 this.panelStart.setVisible(true);
@@ -143,10 +147,18 @@ public class MainForm extends javax.swing.JFrame implements Observer {
                 this.remove(panelAuthenticate);
                 this.panelMail.setVisible(true);
                 this.add(panelMail);
+                // this.add(scrollPanel);
                 this.currentPannel = panelMail;
 
-                //TODO Show all the messages received
-                this.resultPanel.setText(this.client.getMessageReceived().get(0));
+                //TODO Change this way of showing the mails
+                String finalString = "";
+                ArrayList<String> listOfMessage = this.client.getMessageReceived();
+
+                for(int i = 0; i < listOfMessage.size(); i++){
+                    finalString += listOfMessage.get(i);
+                    finalString += "--------------------------------------";
+                }
+                this.resultPanel.setText(finalString);
             }
         }
     }

@@ -49,25 +49,17 @@ public class ClientConnection {
      * @param address IP Address of the server to reach
      */
     private void createConnection(InetAddress address, int port) throws IOException {
-        try {
-            this.socket = new Socket(address, port);
-            this.out = new BufferedOutputStream(this.getSocket().getOutputStream());
-            this.in = new BufferedInputStream(this.getSocket().getInputStream());
-
-        } catch (IOException e) {
-            throw e;
-        }
+        this.socket = new Socket(address, port);
+        this.socket.setSoTimeout(this.TIMEOUT * 1000);
+        this.out = new BufferedOutputStream(this.getSocket().getOutputStream());
+        this.in = new BufferedInputStream(this.getSocket().getInputStream());
     }
 
     /**
      * End the connection with the server by closing the socket
      */
     public void closeConnection() throws IOException {
-        try {
-            this.socket.close();
-        } catch (IOException e) {
-            throw e;
-        }
+        this.socket.close();
     }
 
 
@@ -75,41 +67,22 @@ public class ClientConnection {
      * Send the message to the server through the created streams
      */
     public void sendMessage(String message) throws IOException {
-        try {
-            logger.info("Client : "+message);
-            this.out.write(message.getBytes());
-            this.out.flush();
-        } catch (IOException e) {
-            throw e;
-        }
+        logger.info("Client : "+message);
+        this.out.write(message.getBytes());
+        this.out.flush();
     }
 
     /**
      * Wait for the response from the server and send back the response with a string format
      */
-    public String waitForResponse() throws Exception {
+    public String waitForResponse() throws IOException {
         StringBuilder response = new StringBuilder();
-        try {
-            /* We are going to wait until the response arrived or the timeout expired*/
-            Timer timer = new Timer();
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-
-                }
-            }, this.TIMEOUT * 1000);
-
-
             response.append(((char) in.read()));
             while (in.available() != 0) {
                 response.append(((char) in.read()));
             }
 
-            logger.info("Server : "+response.toString());
-        } catch (IOException e) {
-            this.logger.error(e.getMessage());
-            throw e;
-        }
+            logger.info("Server : " + response.toString());
         return response.toString();
     }
 }
