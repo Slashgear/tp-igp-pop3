@@ -35,10 +35,6 @@ public class StateAuthentication extends State {
         this.setMsgToSend(message.toString());
     }
 
-    /*public int getNumberOfTries(){
-        return this.numberOfTries;
-    }*/
-
     @Override
     public boolean analyze(String message) {
         Boolean response = false;

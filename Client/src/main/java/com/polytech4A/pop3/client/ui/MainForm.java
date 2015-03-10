@@ -16,20 +16,21 @@ import java.util.Observer;
  */
 public class MainForm extends javax.swing.JFrame implements Observer {
     private JPanel panelStart;
-    private JPanel panelAuthenticate;
     private JTextField AddressTextInput;
     private JTextField PortTextInput;
     private JButton validerStartButton;
+
+    private JPanel panelAuthenticate;
     private JTextField passwordTextInput;
     private JButton validerAuthenticateButton;
     private JTextField userTextInput;
+
     private JPanel panelMail;
     private JEditorPane resultPanel;
     private JButton closeConnectionButton;
     private JLabel ltitle;
-    private JScrollPane scrollPanel;
 
-    private JPanel currentPannel;
+    private JPanel currentPanel;
 
     private Client client;
 
@@ -67,10 +68,9 @@ public class MainForm extends javax.swing.JFrame implements Observer {
         this.setSize(400, 400);
         this.panelStart.setVisible(true);
         this.add(panelStart);
-        this.currentPannel = panelStart;
+        this.currentPanel = panelStart;
         this.AddressTextInput.setText("127.0.0.1");
         this.PortTextInput.setText("1010");
-        //this.scrollPanel = new JScrollPane(this.resultPanel);
     }
 
 
@@ -113,7 +113,7 @@ public class MainForm extends javax.swing.JFrame implements Observer {
         this.remove(panelMail);
         this.panelStart.setVisible(true);
         this.add(panelStart);
-        this.currentPannel = panelStart;
+        this.currentPanel = panelStart;
     }
 
 
@@ -128,11 +128,11 @@ public class MainForm extends javax.swing.JFrame implements Observer {
             State currentState = ((Client) o).getCurrentState();
 
             if(currentState == null || currentState instanceof StateWFClose){
-                this.currentPannel.setVisible(false);
-                this.remove(this.currentPannel);
+                this.currentPanel.setVisible(false);
+                this.remove(this.currentPanel);
                 this.panelStart.setVisible(true);
                 this.add(panelStart);
-                this.currentPannel = panelStart;
+                this.currentPanel = panelStart;
             }
 
             if(currentState instanceof StateAuthentication){
@@ -140,7 +140,7 @@ public class MainForm extends javax.swing.JFrame implements Observer {
                 this.remove(panelStart);
                 this.panelAuthenticate.setVisible(true);
                 this.add(panelAuthenticate);
-                this.currentPannel = panelAuthenticate;
+                this.currentPanel = panelAuthenticate;
             }
 
             if(currentState instanceof StateTransaction){
@@ -148,8 +148,7 @@ public class MainForm extends javax.swing.JFrame implements Observer {
                 this.remove(panelAuthenticate);
                 this.panelMail.setVisible(true);
                 this.add(panelMail);
-                // this.add(scrollPanel);
-                this.currentPannel = panelMail;
+                this.currentPanel = panelMail;
 
                 //TODO Change this way of showing the mails
                 String finalString = "";
