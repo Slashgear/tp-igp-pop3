@@ -87,8 +87,17 @@ public class User {
      *
      * @param mail : Mail to delete
      */
-    public void deleteMail(Mail mail) {
+    public void deleteMail(Mail mail) throws FileNotFoundException {
         mails.remove(mail);
+        File file= new File("./Server_mails/"+this.getLogin());
+        if(file.exists()&& file.isDirectory()){
+            File[] messages=file.listFiles();
+            for(int i=0;i<messages.length;i++){
+                if(!messages[i].getName().contains("lock")){
+                    messages[i].delete();
+                }
+            }
+        }else throw new FileNotFoundException("Directory Server_mail was not found");
     }
 
     /**
