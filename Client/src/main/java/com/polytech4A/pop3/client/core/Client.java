@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 /**
  * Main class for the client
  */
-public class Client extends Observable implements Runnable {
+public class Client extends Observable{
     private static Logger logger = Logger.getLogger(ClientMain.class);
 
     private ClientConnection connection;
@@ -274,37 +274,6 @@ public class Client extends Observable implements Runnable {
             logger.error("Error during the closing of the connection");
             this.showError("Erreur pendant la fermeture de la connexion");
         }
-    }
-
-
-    @Override
-    public void run() {
-        this.processing();
-    }
-
-
-    /**
-     * Allow the transition between states if the required conditions are OK
-     */
-    private void processing(){
-        //TODO Remove that because it's useless
-        /*String response = null;
-        try {
-            response = this.connection.waitForResponse();
-        } catch (Exception e) {
-            this.showError(e.getMessage());
-        }
-
-        if(this.currentState.analyze(response)){
-            if(!this.currentState.getWaitForTheUser()){
-                this.currentState.action();
-                this.currentState = this.currentState.getNextState();
-                this.updateObservers();
-            }
-        }
-        else{
-            logger.error("");
-        }*/
     }
 
 
