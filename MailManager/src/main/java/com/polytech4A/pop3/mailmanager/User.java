@@ -5,7 +5,6 @@ import com.polytech4A.pop3.mailmanager.Exceptions.MalFormedMailException;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Scanner;
 
 /**
  * Created by Dimitri on 04/03/2015.
@@ -35,14 +34,6 @@ public class User {
      */
     private String path;
 
-    public String getPassword() {
-        return password;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
     /**
      * Constructor of the User
      */
@@ -51,6 +42,14 @@ public class User {
         this.password = password;
         this.path = path + login;
         this.mails = new ArrayList<Mail>();
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getLogin() {
+        return login;
     }
 
     /**
@@ -149,7 +148,11 @@ public class User {
         Date date = new Date();
 
         try {
-            File file= new File("./Client_mails/mails_" + date.getTime() + ".txt");
+            File directory= new File("./Client_mails/"+login+"/");
+            if(!directory.exists()){
+                directory.mkdir();
+            }
+            File file= new File("./Client_mails/"+login+"/mails_" + date.getTime() + ".txt");
             file.createNewFile();
             BufferedWriter bfile = new BufferedWriter(new FileWriter(file.getAbsoluteFile(), true));
             for (Mail mail : mails) {
