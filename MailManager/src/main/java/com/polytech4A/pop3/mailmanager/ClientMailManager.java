@@ -4,6 +4,7 @@ import com.polytech4A.pop3.mailmanager.Exceptions.MailManagerException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Created by Dimitri on 07/03/2015.
@@ -82,8 +83,8 @@ public class ClientMailManager extends MailManager {
      * @param mail
      * @return
      */
-    public boolean addMail(String mail) {
-        return users.get(0).addMail(mail);
+    public boolean addMail(String text) {
+        return users.get(0).addMail(text);
     }
 
     /**
@@ -94,7 +95,10 @@ public class ClientMailManager extends MailManager {
         User user = new User(login, password, path);
         //if you uncomment the line below, the program will search for the registered user's mails
         //user.initMails();
-        //users.add(user);
+        if(users == null){
+            users=new ArrayList<User>();
+        }
+        users.add(user);
         return user;
     }
 }

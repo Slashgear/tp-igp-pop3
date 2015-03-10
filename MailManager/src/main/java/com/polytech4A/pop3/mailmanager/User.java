@@ -140,14 +140,18 @@ public class User {
         Date date = new Date();
 
         try {
-            BufferedWriter file = new BufferedWriter(new FileWriter(path + "/mails_" + date.toString() + ".txt", true));
+            File file= new File("./Client_mails/mails_" + date.getTime() + ".txt");
+            file.createNewFile();
+            BufferedWriter bfile = new BufferedWriter(new FileWriter(file.getAbsoluteFile(), true));
             for (Mail mail : mails) {
-                file.write(mail.getOutput().toString());
-                file.newLine();
+                bfile.write(mail.getOutput().toString());
+                bfile.newLine();
+                bfile.flush();
             }
-            file.close();
+            bfile.close();
         } catch (IOException e) {
-            System.out.println("User.saveMail : Can't create file : " + path + "/mails_" + date.toString() + ".txt");
+            System.out.println(e);
+            System.out.println("User.saveMail : Can't create file : " + path + "/mails_" + date.getTime() + ".txt");
         }
     }
 
