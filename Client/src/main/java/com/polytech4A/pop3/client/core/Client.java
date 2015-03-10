@@ -203,7 +203,7 @@ public class Client extends Observable implements Runnable {
                 /*Will cut the string because we receive two parts: OK number_of_octets + the mail*/
                 int endFirstMessage = messageReceived.indexOf('\n');
                 if(endFirstMessage > 0){
-                    String mailReceived = messageReceived.substring(0, endFirstMessage);
+                    String mailReceived = messageReceived.substring(endFirstMessage, messageReceived.length());
                     /* TODO ajouter les mails à l'utilisateur */
 
                     this.newMessageToShow(mailReceived);
@@ -221,12 +221,10 @@ public class Client extends Observable implements Runnable {
                 this.showError("Ne peut plus joindre le serveur");
             }
         }
-        this.currentState.action();
-        this.currentState = this.currentState.getNextState();
-        this.askForCloseConnection();
 
         if(numberOfMessages == 0){
             this.showError("Vous n'avez pas de nouveaux messages, vous êtes déconnecté");
+            this.askForCloseConnection();
         }
     }
 
@@ -235,8 +233,11 @@ public class Client extends Observable implements Runnable {
      * After the reception of the last message, we send a last message to the server
      * We close the connection after that
      */
-    private void askForCloseConnection(){
+    public void askForCloseConnection(){
         this.logger.debug("Asking for closing the connection");
+
+        this.currentState.action();
+        this.currentState = this.currentState.getNextState();
 
         String toSend = this.currentState.getMsgToSend();
 
@@ -256,7 +257,7 @@ public class Client extends Observable implements Runnable {
     /**
      * Will call the closing of the connection (call at the end or when an important error occurred)
      */
-    public void closeConnection(){
+    private void closeConnection(){
         try {
             this.connection.closeConnection();
             this.connection = null;

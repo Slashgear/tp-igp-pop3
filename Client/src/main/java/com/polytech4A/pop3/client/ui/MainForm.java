@@ -105,7 +105,7 @@ public class MainForm extends javax.swing.JFrame implements Observer {
      * @param evt
      */
     private void closeConnectionButtonActionPerformed(java.awt.event.ActionEvent evt){
-        this.client.closeConnection();
+        this.client.askForCloseConnection();
         this.panelMail.setVisible(false);
         this.remove(panelMail);
         this.panelStart.setVisible(true);
