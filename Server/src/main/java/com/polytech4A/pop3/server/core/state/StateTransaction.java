@@ -12,6 +12,9 @@ import com.polytech4A.pop3.messages.RetrMessage;
 import com.polytech4A.pop3.server.core.Server;
 import org.apache.log4j.Logger;
 
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+
 /**
  * Created by Adrien on 05/03/2015.
  *
@@ -65,7 +68,8 @@ public class StateTransaction extends State {
             } else if (QuitMessage.matches(message)) {
                 setNextState(new StateInit());
                 if(deleteMsg) {
-                    for(Mail mail : user.getMails()) {
+                    ArrayList<Mail> mails=user.getMails();
+                    for(Mail mail : mails) {
                         user.deleteMail(mail);
                     }
                 }
@@ -77,6 +81,8 @@ public class StateTransaction extends State {
             logger.error("Error during creation of messages\n" + e.getMessage());
             this.setNextState(new StateInit());
             this.setMsgToSend(new PermissionDeniedErr().toString());
+        } catch (FileNotFoundException e) {
+            logger.error("DELETE of messages Failed"+e.getMessage());
         }
         return false;
     }

@@ -49,21 +49,6 @@ public class ServerMailManager extends MailManager {
     }
 
     /**
-     * Get the list of mails of a ServerMailManager's user
-     *
-     * @param user : User
-     * @return List of mails
-     */
-    public ArrayList<Mail> getMails(User user) {
-        if (isLockedUser(user)) {
-            for (Mail mail : user.getMails()) {
-                user.deleteMail(mail);
-            }
-        }
-        return null;
-    }
-
-    /**
      * Check if a MailManager's user is locked
      *
      * @param user : User to test
