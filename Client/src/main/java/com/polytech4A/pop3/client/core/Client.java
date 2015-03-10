@@ -11,8 +11,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Observable;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Main class for the client
@@ -63,7 +61,7 @@ public class Client extends Observable{
      * Call the update of what must be show in the view
      */
     private void updateObservers() {
-        this.logger.debug("Asking for the update of the view");
+        logger.debug("Asking for the update of the view");
         setChanged();
         notifyObservers();
     }
@@ -76,11 +74,11 @@ public class Client extends Observable{
         InetAddress address = null;
 
         /*Verification of the validity of the inputs*/
-        String IP_ADDRESS_PATTERN = "^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)" +
+       /* String IP_ADDRESS_PATTERN = "^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)" +
                 "\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
         Matcher matcher = Pattern.compile(IP_ADDRESS_PATTERN).matcher(addressString);
-
-        if(port > 65535 || port < 1 || !matcher.find()){
+        */
+        if(port > 65535 || port < 1 /*|| !matcher.find()*/){
             logger.error("Ip address or port unreacheable");
             this.showError("L'adresse IP ou le port ne sont pas corrects");
         }
@@ -105,7 +103,7 @@ public class Client extends Observable{
      * Wait for the first message of the server
      */
     public void waitFirstMessage(){
-        this.logger.debug("Waiting for first message");
+        logger.debug("Waiting for first message");
         try {
             String response = this.connection.waitForResponse();
             if(this.currentState.analyze(response)){
@@ -128,7 +126,7 @@ public class Client extends Observable{
      * @param password String that will contain the password of the user
      */
     public void makeAuthentication(String user, String password){
-        this.logger.debug("Attempt to authenticate");
+        logger.debug("Attempt to authenticate");
         if(this.currentState instanceof StateAuthentication){
             String response;
             try {
@@ -183,7 +181,7 @@ public class Client extends Observable{
      */
     private void receiveMessages(String response){
         int i = 1;
-        this.logger.debug("Reception of the mails from the server");
+        logger.debug("Reception of the mails from the server");
         this.messageReceived = new ArrayList<String>();
         int numberOfMessages = ((StateTransaction)this.currentState).analyseNumberOfMessages(response);
 
@@ -195,7 +193,7 @@ public class Client extends Observable{
                 try {
                     messageReceived = this.connection.waitForResponse();
                 } catch (Exception e) {
-                    this.logger.error("Cannot receive message from the server");
+                    logger.error("Cannot receive message from the server");
                     this.showError("Ne peut plus joindre le serveur");
                 }
 
@@ -205,17 +203,17 @@ public class Client extends Observable{
                     String mailReceived = messageReceived.substring(endFirstMessage, messageReceived.length());
                     this.mailManager.addMail(mailReceived);
                     this.newMessageToShow(mailReceived);
-                    this.logger.debug("Reception of message " + i);
+                    logger.debug("Reception of message " + i);
                     toSend = this.currentState.getMsgToSend();
                     i++;
                 }
                 else{
-                    this.logger.error("Error in the message " + i + " from the server");
+                    logger.error("Error in the message " + i + " from the server");
                     this.showError("Erreur lors de la transmission du mail " + i + " par le serveur");
                 }
             }
             catch (IOException e) {
-                this.logger.error("Cannot send RETR message to the server");
+                logger.error("Cannot send RETR message to the server");
                 this.showError("Ne peut plus joindre le serveur");
             }
         }
@@ -234,7 +232,7 @@ public class Client extends Observable{
      * we want to receive an OK message and we close the connection
      */
     private void askForCloseConnection(){
-        this.logger.debug("Asking for closing the connection");
+        logger.debug("Asking for closing the connection");
 
         this.currentState.action();
         this.currentState = this.currentState.getNextState();
@@ -245,11 +243,11 @@ public class Client extends Observable{
             try{
                 String response = this.connection.waitForResponse();
                 if(!this.currentState.analyze(response)){
-                    this.logger.error("No reception of OK message from the server after QUIT");
+                    logger.error("No reception of OK message from the server after QUIT");
                 }
             }
             catch(IOException e){
-                this.logger.error("Timeout from the server");
+                logger.error("Timeout from the server");
                 this.showError("Timeout from the server");
             }
         } catch (IOException e) {
@@ -279,7 +277,7 @@ public class Client extends Observable{
             System.gc();
 
             this.updateObservers();
-            this.logger.debug("Connection closed");
+            logger.debug("Connection closed");
         } catch (IOException e) {
             logger.error("Error during the closing of the connection");
             this.showError("Erreur pendant la fermeture de la connexion");
