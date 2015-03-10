@@ -26,6 +26,7 @@ public class MainForm extends javax.swing.JFrame implements Observer {
     private JPanel panelMail;
     private JEditorPane resultPanel;
     private JButton closeConnectionButton;
+    private JScrollPane scrollPanel;
 
     private JPanel currentPannel;
 
@@ -68,6 +69,7 @@ public class MainForm extends javax.swing.JFrame implements Observer {
         this.currentPannel = panelStart;
         this.AddressTextInput.setText("127.0.0.1");
         this.PortTextInput.setText("1010");
+        //this.scrollPanel = new JScrollPane(this.resultPanel);
     }
 
 
@@ -145,9 +147,10 @@ public class MainForm extends javax.swing.JFrame implements Observer {
                 this.remove(panelAuthenticate);
                 this.panelMail.setVisible(true);
                 this.add(panelMail);
+                // this.add(scrollPanel);
                 this.currentPannel = panelMail;
 
-                //TODO Show all the messages received
+                //TODO Change this way of showing the mails
                 String finalString = "";
                 ArrayList<String> listOfMessage = this.client.getMessageReceived();
 
