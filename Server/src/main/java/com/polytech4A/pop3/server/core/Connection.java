@@ -128,7 +128,7 @@ public class Connection implements Runnable {
     public void sendMessage() {
         try {
             logger.info("Server : " + state.getMsgToSend());
-            out.write(state.getMsgToSend().getBytes());
+            out.write(state.getMsgToSend().getBytes("UTF-8"));
             out.flush();
         } catch (IOException e) {
             logger.error("Error during writing through server output\n" + e.getMessage());

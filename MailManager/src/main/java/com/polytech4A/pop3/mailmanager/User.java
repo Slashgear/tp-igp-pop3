@@ -176,16 +176,16 @@ public class User {
         try {
             for (File fileEntry : folder.listFiles()) {
                 if (!fileEntry.isDirectory()&& !fileEntry.getAbsolutePath().contains("lock")) {
-                    BufferedInputStream in = new BufferedInputStream(new FileInputStream(new File(fileEntry.getAbsolutePath())));
-                    StringWriter out = new StringWriter();
-                    int b;
-                    while ((b=in.read()) != -1) {
-                        out.write(b);
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(fileEntry.getAbsolutePath())), "UTF-8"));
+                    StringBuilder builder = new StringBuilder();
+                    String separator = System.getProperty("line.separator");
+                    String line;
+                    while((line = reader.readLine()) != null) {
+                        builder.append(line);
+                        builder.append(separator);
                     }
-                    out.flush();
-                    out.close();
-                    in.close();
-                    mails.add(new Mail(out.toString()));
+                    reader.close();
+                    mails.add(new Mail(builder.toString()));
                 }
             }
         } catch (FileNotFoundException e) {

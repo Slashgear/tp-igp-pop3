@@ -1,5 +1,8 @@
 package com.polytech4A.pop3.client.core;
 
+import com.polytech4A.pop3.messages.Exceptions.MalFormedMessageException;
+import com.polytech4A.pop3.messages.MailMessage;
+import com.sun.xml.internal.ws.encoding.MtomCodec;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -67,7 +70,7 @@ public class ClientConnection {
      * Send the message to the server through the created streams
      */
     public void sendMessage(String message) throws IOException {
-        logger.info("Client : "+message);
+        logger.info("Client : " + message);
         this.out.write(message.getBytes());
         this.out.flush();
     }
@@ -77,12 +80,30 @@ public class ClientConnection {
      */
     public String waitForResponse() throws IOException {
         StringBuilder response = new StringBuilder();
+        response.append(((char) in.read()));
+        while (in.available() != 0) {
             response.append(((char) in.read()));
-            while (in.available() != 0) {
-                response.append(((char) in.read()));
-            }
-
-            logger.info("Server : " + response.toString());
+        }
+        logger.info("Server : " + response.toString());
         return response.toString();
+    }
+
+    /**
+     * Wait for the response containing a mail from the server and send back the response with a string format.
+     *
+     * @return Response to send, in a String.
+     * @throws IOException
+     */
+    public String waitForMailResponse() throws IOException, MalFormedMessageException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+        StringBuilder response = new StringBuilder();
+        response.append(reader.readLine());
+        MailMessage mailMess = new MailMessage(response.toString());
+        char[] buf = new char[mailMess.getSize()];
+        reader.read(buf, 0, mailMess.getSize());
+        response.append(buf);
+        logger.info("Server : " + response.toString());
+        return response.toString();
+
     }
 }

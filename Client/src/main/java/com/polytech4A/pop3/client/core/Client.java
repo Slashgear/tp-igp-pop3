@@ -191,7 +191,7 @@ public class Client extends Observable{
                 this.connection.sendMessage(toSend);
                 String messageReceived = null;
                 try {
-                    messageReceived = this.connection.waitForResponse();
+                    messageReceived = this.connection.waitForMailResponse();
                 } catch (Exception e) {
                     logger.error("Cannot receive message from the server");
                     this.showError("Ne peut plus joindre le serveur");
