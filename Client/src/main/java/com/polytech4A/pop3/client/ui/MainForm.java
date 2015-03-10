@@ -26,6 +26,7 @@ public class MainForm extends javax.swing.JFrame implements Observer {
     private JPanel panelMail;
     private JEditorPane resultPanel;
     private JButton closeConnectionButton;
+    private JLabel ltitle;
     private JScrollPane scrollPanel;
 
     private JPanel currentPannel;
