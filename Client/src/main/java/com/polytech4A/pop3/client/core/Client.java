@@ -81,13 +81,12 @@ public class Client extends Observable implements Runnable {
         Matcher matcher = Pattern.compile(IP_ADDRESS_PATTERN).matcher(addressString);
 
         if(port > 65535 || port < 1 || !matcher.find()){
+            logger.error("Ip address or port unreacheable");
             this.showError("L'adresse IP ou le port ne sont pas corrects");
         }
         else{
             try {
-                // TODO Delete les system.out.println
                 address = InetAddress.getByName(addressString);
-
                 logger.info("Etablissement de la connexion");
                 this.connection = new ClientConnection(address, port);
                 logger.info("Connexion établie");
@@ -211,8 +210,7 @@ public class Client extends Observable implements Runnable {
         }
         finally {
             this.currentState.getNextState();
-            this.closeConnection();
-            this.updateObservers();
+            //this.closeConnection();
         }
     }
 
