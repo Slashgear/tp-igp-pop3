@@ -220,7 +220,6 @@ public class Client extends Observable{
         this.askForCloseConnection();
         if(numberOfMessages == 0){
             this.showError("Vous n'avez pas de nouveaux messages, vous êtes déconnecté");
-            this.askForCloseConnection();
         }else {
             this.mailManager.saveMails();
         }
