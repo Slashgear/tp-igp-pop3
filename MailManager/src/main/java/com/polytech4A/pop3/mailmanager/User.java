@@ -156,6 +156,7 @@ public class User {
      */
     public void initMails() {
         File folder = new File(path);
+        mails.clear();
         try {
             for (File fileEntry : folder.listFiles()) {
                 if (!fileEntry.isDirectory()&& !fileEntry.getAbsolutePath().contains("lock")) {

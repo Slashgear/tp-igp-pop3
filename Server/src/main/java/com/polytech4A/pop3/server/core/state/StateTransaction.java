@@ -54,7 +54,7 @@ public class StateTransaction extends State {
         try {
             if (RetrMessage.matches(message)) {
                 RetrMessage retr = new RetrMessage(message);
-                Mail mail = user.getMails().get(retr.getNoMessages());
+                Mail mail = user.getMails().get(retr.getNoMessages()-1);
                 StringBuffer buf = new StringBuffer();
                 buf.append(new MailMessage(mail.getOutput().toString().getBytes().length));
                 buf.append("\n");
