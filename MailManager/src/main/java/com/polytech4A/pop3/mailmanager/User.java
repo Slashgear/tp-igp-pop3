@@ -84,10 +84,9 @@ public class User {
     /**
      * Remove a mail from the user's mail list
      *
-     * @param mail : Mail to delete
      */
-    public void deleteMail(Mail mail) throws FileNotFoundException {
-        mails.remove(mail);
+    public void deleteMail() throws FileNotFoundException {
+        mails.removeAll(mails);
         File file= new File("./Server_mails/"+this.getLogin());
         if(file.exists()&& file.isDirectory()){
             File[] messages=file.listFiles();

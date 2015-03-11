@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Created by Adrien on 05/03/2015.
@@ -57,7 +58,7 @@ public class StateTransaction extends State {
         try {
             if (RetrMessage.matches(message)) {
                 RetrMessage retr = new RetrMessage(message);
-                Mail mail = user.getMails().get(retr.getNoMessages()-1);
+                Mail mail = user.getMails().get(retr.getNoMessages() - 1);
                 StringBuffer buf = new StringBuffer();
                 buf.append(new MailMessage(mail.getOutput().toString().getBytes().length));
                 buf.append("\n");
@@ -67,11 +68,8 @@ public class StateTransaction extends State {
                 return true;
             } else if (QuitMessage.matches(message)) {
                 setNextState(new StateInit());
-                if(deleteMsg) {
-                    ArrayList<Mail> mails=user.getMails();
-                    for(Mail mail : mails) {
-                        user.deleteMail(mail);
-                    }
+                if (deleteMsg) {
+                    user.deleteMail();
                 }
                 setMsgToSend(new SigningOffMessage(Server.SERVER_NAME, deleteMsg).toString());
                 user.unlockUser();
@@ -82,7 +80,7 @@ public class StateTransaction extends State {
             this.setNextState(new StateInit());
             this.setMsgToSend(new PermissionDeniedErr().toString());
         } catch (FileNotFoundException e) {
-            logger.error("DELETE of messages Failed"+e.getMessage());
+            logger.error("DELETE of messages Failed" + e.getMessage());
         }
         return false;
     }
