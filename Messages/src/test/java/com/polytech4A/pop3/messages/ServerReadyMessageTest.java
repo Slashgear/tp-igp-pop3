@@ -28,8 +28,8 @@ public class ServerReadyMessageTest extends TestCase {
      */
     public void setUp() throws Exception {
         super.setUp();
-        serverReadyMessageToParse =new ServerReadyMessage("+OK alpha this is a test.");
-        serverReadyMessageToCreate =new ServerReadyMessage("beta this is another test.");
+        serverReadyMessageToParse =new ServerReadyMessage("+OK alpha 2015/01/15 15:20:18");
+        serverReadyMessageToCreate =new ServerReadyMessage("beta","2018/20/17 20:34:27");
     }
 
     /**
@@ -47,7 +47,7 @@ public class ServerReadyMessageTest extends TestCase {
      * @throws Exception
      */
     public void testCreate() throws Exception {
-        assertEquals("+OK beta this is another test.",serverReadyMessageToCreate.toString());
+        assertEquals("+OK beta 2018/20/17 20:34:27",serverReadyMessageToCreate.toString());
         assertEquals(true,ServerReadyMessage.matches(serverReadyMessageToCreate.toString()));
         assertEquals("beta",serverReadyMessageToCreate.getServerName());
 
@@ -58,7 +58,7 @@ public class ServerReadyMessageTest extends TestCase {
      * @throws Exception
      */
     public void testParsing() throws Exception {
-        assertEquals("+OK alpha this is a test.",serverReadyMessageToParse.toString());
+        assertEquals("+OK alpha 2015/01/15 15:20:18",serverReadyMessageToParse.toString());
         assertEquals(true,ServerReadyMessage.matches(serverReadyMessageToParse.toString()));
         assertEquals("alpha",serverReadyMessageToParse.getServerName());
     }

@@ -2,6 +2,10 @@ package com.polytech4A.pop3.messages;
 
 import junit.framework.TestCase;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 /**
  * Created by Antoine on 02/03/2015.
  *
@@ -19,7 +23,9 @@ public class ApopMessageTest extends TestCase {
     public void setUp() throws Exception {
         super.setUp();
         apopMessageToParse = new ApopMessage("APOP Adrien CHAUSSENDE");
-        apopMessageToCreate = new ApopMessage("Antoine", "CARON");
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Calendar cal = Calendar.getInstance();
+        apopMessageToCreate = new ApopMessage("Antoine", "CARON",dateFormat.format(cal.getTime()));
     }
 
     public void tearDown() throws Exception {
@@ -29,13 +35,10 @@ public class ApopMessageTest extends TestCase {
     }
 
     public void testParsing() throws Exception {
-        assertEquals("APOP Adrien CHAUSSENDE", apopMessageToParse.toString());
         assertEquals("Adrien", apopMessageToParse.getId());
-        assertEquals("CHAUSSENDE", apopMessageToParse.getPassword());
     }
 
     public void testCreate() throws Exception {
-        assertEquals("APOP Antoine CARON", apopMessageToCreate.toString());
         assertEquals("Antoine", apopMessageToCreate.getId());
         assertEquals("CARON", apopMessageToCreate.getPassword());
     }

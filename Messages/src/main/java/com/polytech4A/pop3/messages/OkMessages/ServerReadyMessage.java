@@ -1,5 +1,6 @@
 package com.polytech4A.pop3.messages.OkMessages;
 
+import com.polytech4A.pop3.messages.Exceptions.MalFormedMessageException;
 import com.polytech4A.pop3.messages.OkMessage;
 
 import java.util.regex.Pattern;
@@ -20,6 +21,20 @@ public class ServerReadyMessage extends OkMessage {
     private String serverName;
 
     /**
+     * Server Arpa internet Text Message defined in the RFC 822.
+     */
+    private String arpa;
+
+    /**
+     * Getter of Arpa.
+     *
+     * @return String Arpa.
+     */
+    public String getArpa() {
+        return arpa;
+    }
+
+    /**
      * Getter of the server name.
      *
      * @return servername String
@@ -31,21 +46,26 @@ public class ServerReadyMessage extends OkMessage {
     /**
      * Constructor of a ServerReadyMessage with a message in parameter to parse.
      *
-     * @param text message to parse.
+     * @param message to parse.
      */
-    public ServerReadyMessage(String text) {
+    public ServerReadyMessage(String message) throws MalFormedMessageException {
         super();
         String[] array;
-        if (ServerReadyMessage.matches(text)) {
-             array= text.split(" ");
-            this.serverName =array[1];
+        if (ServerReadyMessage.matches(message)) {
+            array = message.split(" ");
+            this.serverName = array[1];
+            this.arpa = message.split(serverName+" ")[1];
             construct();
-        } else {
-            array= text.split(" ");
-            this.serverName = array[0];
-            construct();
-
+        } else{
+            throw new MalFormedMessageException("ServerReadyMessage is not correct expected: \"^\\+OK \\S* \\S*");
         }
+    }
+
+
+    public ServerReadyMessage(String serverName, String arpa) {
+        this.serverName = serverName;
+        this.arpa = arpa;
+        construct();
     }
 
     /**
@@ -54,7 +74,8 @@ public class ServerReadyMessage extends OkMessage {
     private void construct() {
         this.message.append(" ");
         this.message.append(serverName);
-        this.message.append(" POP3 server ready");
+        this.message.append(" ");
+        this.message.append(arpa);
     }
 
     /**
