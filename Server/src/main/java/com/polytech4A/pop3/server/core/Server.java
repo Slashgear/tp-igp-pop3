@@ -2,6 +2,10 @@ package com.polytech4A.pop3.server.core;
 
 import org.apache.log4j.Logger;
 
+import javax.net.ServerSocketFactory;
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocket;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -39,14 +43,14 @@ public class Server {
     /**
      * Server's socket.
      */
-    private ServerSocket socket;
+    private SSLServerSocket socket;
 
     /**
      * Getter of server's socket.
      *
      * @return socket ServerSocket
      */
-    public ServerSocket getSocket() {
+    public SSLServerSocket getSocket() {
         return socket;
     }
 
@@ -69,7 +73,8 @@ public class Server {
      */
     private void start(int port, int nbConnections) {
         try {
-            this.socket = new ServerSocket(port, nbConnections);
+            ServerSocketFactory sslFactory = SSLServerSocketFactory.getDefault();
+            this.socket = (SSLServerSocket) sslFactory.createServerSocket(port, nbConnections);
             logger.info("Starting server on port " + port + ".");
         } catch (IOException e) {
             logger.error("Impossible to start server, port may " + port + " be busy");
@@ -80,7 +85,7 @@ public class Server {
     /**
      * Socket waits for a connection and then starts a thread with the pro
      */
-    public void openConnection(Socket socket) {
+    public void openConnection(SSLSocket socket) {
         Thread connectionThread = new Thread(new Connection(socket));
         connectionThread.start();
     }
@@ -105,7 +110,7 @@ public class Server {
         logger.info("LISTENING... ...");
         while (listening) {
             try {
-                this.openConnection(this.socket.accept());
+                this.openConnection((SSLSocket) this.socket.accept());
             } catch (IOException e) {
                 logger.error("Error during connection accepting");
                 logger.error(e.getMessage());

@@ -5,6 +5,7 @@ import com.polytech4A.pop3.server.core.state.State;
 import com.polytech4A.pop3.server.core.state.StateInit;
 import org.apache.log4j.Logger;
 
+import javax.net.ssl.SSLSocket;
 import java.io.*;
 import java.net.Socket;
 
@@ -26,7 +27,7 @@ public class Connection implements Runnable {
     /**
      * Socket when the connection was established.
      */
-    private Socket socket;
+    private SSLSocket socket;
 
     /**
      * Current state of the connection.
@@ -50,7 +51,7 @@ public class Connection implements Runnable {
     /**
      * Constructor of the connection. It will be in initialization state. Initialize the two streams (output and input).
      */
-    public Connection(Socket socket) {
+    public Connection(SSLSocket socket) {
         try {
             this.socket = socket;
             this.state = new StateInit();

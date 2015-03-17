@@ -10,6 +10,7 @@
 out
 Server_Log/
 Client_Log/
+Client_mails/
 mails/
 
 # Mac
