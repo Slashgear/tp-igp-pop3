@@ -5,11 +5,12 @@ import com.polytech4A.pop3.messages.MailMessage;
 import com.sun.xml.internal.ws.encoding.MtomCodec;
 import org.apache.log4j.Logger;
 
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Connection class for the client
@@ -22,7 +23,7 @@ public class ClientConnection {
      */
     private static final int TIMEOUT = 5;
 
-    private Socket socket;
+    private SSLSocket socket;
     private BufferedOutputStream out;
     private BufferedInputStream in;
 
@@ -52,7 +53,9 @@ public class ClientConnection {
      * @param address IP Address of the server to reach
      */
     private void createConnection(InetAddress address, int port) throws IOException {
-        this.socket = new Socket(address, port);
+        SocketFactory factory = SSLSocketFactory.getDefault();
+
+        this.socket = (SSLSocket) factory.createSocket(address, port);
         this.socket.setSoTimeout(this.TIMEOUT * 1000);
         this.out = new BufferedOutputStream(this.getSocket().getOutputStream());
         this.in = new BufferedInputStream(this.getSocket().getInputStream());
