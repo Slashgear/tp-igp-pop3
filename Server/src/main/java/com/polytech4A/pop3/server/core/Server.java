@@ -75,6 +75,8 @@ public class Server {
         try {
             ServerSocketFactory sslFactory = SSLServerSocketFactory.getDefault();
             this.socket = (SSLServerSocket) sslFactory.createServerSocket(port, nbConnections);
+            String[] suites = {"SSL_DH_anon_WITH_RC4_128_MD5"};
+            this.socket.setEnabledCipherSuites(suites);
             logger.info("Starting server on port " + port + ".");
         } catch (IOException e) {
             logger.error("Impossible to start server, port may " + port + " be busy");

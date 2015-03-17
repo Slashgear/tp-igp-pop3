@@ -17,8 +17,11 @@ public class StateAuthentication extends State {
     //private int numberOfTries;
     private String errorReceived;
 
-    public StateAuthentication(){
+    private String arpa;
+
+    public StateAuthentication(String arpa){
         this.errorReceived = null;
+        this.arpa = arpa;
     }
 
     public String getErrorReceived() {
@@ -31,7 +34,7 @@ public class StateAuthentication extends State {
      * @param password Password
      */
     public void setAuthenticationMessage(String user, String password){
-        ApopMessage message = new ApopMessage(user, password);
+        ApopMessage message = new ApopMessage(user, password, arpa);
         this.setMsgToSend(message.toString());
     }
 

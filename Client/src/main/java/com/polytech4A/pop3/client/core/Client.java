@@ -121,9 +121,9 @@ public class Client extends Observable{
 
     /**
      * Call by the view to make the authentication of a client, will send request to the server, wait the response
-     * and react to it
-     * @param user String that will contain the mail address of the user
-     * @param password String that will contain the password of the user
+     * and react to it.
+     * @param user String that will contain the mail address of the user.
+     * @param password String that will contain the password of the user.
      */
     public void makeAuthentication(String user, String password){
         logger.debug("Attempt to authenticate");

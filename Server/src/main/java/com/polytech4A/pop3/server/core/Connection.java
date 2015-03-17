@@ -77,7 +77,6 @@ public class Connection implements Runnable {
      */
     public void processing() {
         boolean runConnection = true;
-
         //Server is in init state. We have to send the first message and then update in authorization state.
         logger.info("Connection opened");
         sendMessage();

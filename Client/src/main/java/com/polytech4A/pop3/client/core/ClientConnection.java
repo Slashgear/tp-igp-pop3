@@ -57,6 +57,8 @@ public class ClientConnection {
 
         this.socket = (SSLSocket) factory.createSocket(address, port);
         this.socket.setSoTimeout(this.TIMEOUT * 1000);
+        String[] suites = {"SSL_DH_anon_WITH_RC4_128_MD5"};
+        this.socket.setEnabledCipherSuites(suites);
         this.out = new BufferedOutputStream(this.getSocket().getOutputStream());
         this.in = new BufferedInputStream(this.getSocket().getInputStream());
     }
