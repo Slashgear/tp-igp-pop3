@@ -27,7 +27,7 @@ public class StateAuth extends State {
     /**
      * Logger of the server.
      */
-    private static Logger logger = Logger.getLogger(Server.class);
+    private static Logger logger = Logger.getLogger(StateAuth.class);
 
     /**
      * Number of times that the client tries to log in the server.
@@ -43,6 +43,11 @@ public class StateAuth extends State {
      * User password.
      */
     private String password;
+
+    /**
+     * ARPA of the server.
+     */
+    private String arpa;
 
     /**
      * Maximum number of times that the client can try to log in the server.
@@ -68,6 +73,16 @@ public class StateAuth extends State {
     }
 
     /**
+     * Constructor of the Authorization state of the server
+     *
+     * @param arpa ARPA first sent by the server to verify password.
+     */
+    public StateAuth(String arpa) {
+        super();
+        this.arpa = arpa;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -77,13 +92,14 @@ public class StateAuth extends State {
                 ApopMessage apop = new ApopMessage(message);
                 user = apop.getId();
                 password = apop.getPassword();
-                if (manager.isUserExists(user, password)) {
-                    User usr = manager.initUser(user, password);
-                    if(!manager.isLockedUser(usr)) {
+                User usr = manager.initUser(user, password);
+                boolean bool = apop.verify(usr.getPassword(), arpa);
+                if (manager.isUserExists(user) && bool) {
+                    if (!manager.isLockedUser(usr)) {
                         usr.lockUser();
                         setNextState(new StateTransaction(usr));
                         int mailsSize = 0;
-                        for(Mail mail : usr.getMails()) {
+                        for (Mail mail : usr.getMails()) {
                             mailsSize += mail.getOutput().toString().length();
                         }
                         setMsgToSend(new OkApopMessage(user, usr.getMails().size(), mailsSize).toString());
@@ -97,35 +113,8 @@ public class StateAuth extends State {
                 } else {
                     return invalidAuthProcessing(new NoMailBoxErr(user).toString());
                 }
-            } else if (UserMessage.matches(message)) { //If User name message received ...
-                UserMessage usr = new UserMessage(message);
-                user = usr.getId();
-                setNextState(new StateAuth(nbTry));
-                setMsgToSend(new OkMessage().toString());
-                return true;
-            } else if (PassMessage.matches(message)) { //If Password message received ...
-                PassMessage pw = new PassMessage(message);
-                password = pw.getPassword();
-                if (manager.isUserExists(user, password)) {
-                    User usr = manager.initUser(user, password);
-                    if(usr != null) {
-                        setNextState(new StateTransaction(usr));
-                        int mailsSize = 0;
-                        for(Mail mail : usr.getMails()) {
-                            mailsSize += mail.getOutput().toString().length();
-                        }
-                        setMsgToSend(new OkApopMessage(user, usr.getMails().size(), mailsSize).toString());
-                        return true;
-                    } else {
-                        setNextState(new StateInit());
-                        setMsgToSend(new AlreadyLockedErrMessage().toString());
-                        return false;
-                    }
-                } else {
-                    return invalidAuthProcessing(new NoMailBoxErr(user).toString());
-                }
             } else {
-                return invalidAuthProcessing(new PassMessage(user).toString());
+                return invalidAuthProcessing(new PermissionDeniedErr().toString());
             }
         } catch (MalFormedMessageException e) {
             logger.error("Error during message creation. Malformed." + e.getMessage());

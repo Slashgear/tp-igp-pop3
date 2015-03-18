@@ -121,7 +121,11 @@ public class ApopMessage extends Message {
             out.write(this.password.getBytes("UTF8"));
             out.write(this.arpa.getBytes("UTF8"));
             crypted = MessageDigest.getInstance("MD5").digest(out.toByteArray());
-            this.cryptedPwd = new String(crypted);
+            StringBuffer sb = new StringBuffer();
+            for (byte b : crypted) {
+                sb.append(String.format("%02x", b & 0xff));
+            }
+            this.cryptedPwd = sb.toString();
             this.message.append(cryptedPwd);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
@@ -139,13 +143,17 @@ public class ApopMessage extends Message {
      * @param arpa Arpa of the server, the same given in the ServerReadyMessage.
      * @return true/false true if cryptedPwd of this Apop is equal to MD5(pwd+arpa).
      */
-    private boolean verify(String pwd, String arpa) {
+    public boolean verify(String pwd, String arpa) {
         try {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             out.write(pwd.getBytes("UTF8"));
             out.write(arpa.getBytes("UTF8"));
             byte[] crypted = MessageDigest.getInstance("MD5").digest(out.toByteArray());
-            return (this.cryptedPwd.equals(new String(crypted)));
+            StringBuffer sb = new StringBuffer();
+            for (byte b : crypted) {
+                sb.append(String.format("%02x", b & 0xff));
+            }
+            return (this.cryptedPwd.equals(sb.toString()));
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {

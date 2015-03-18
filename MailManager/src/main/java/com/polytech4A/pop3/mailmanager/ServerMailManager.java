@@ -73,15 +73,15 @@ public class ServerMailManager extends MailManager {
      * Tests if the user exists and if the user is not already connected (lock).
      *
      * @param login    User login.
-     * @param password User password.
      * @return True if user successfully log in.
      */
-    public boolean isUserExists(String login, String password) {
+    public boolean isUserExists(String login) {
         for (User u : users) {
-            if (u.getLogin().equals(login) && u.getPassword().equals(password)) {
+            if (u.getLogin().equals(login)) {
                 return true;
             }
         }
         return false;
     }
+
 }

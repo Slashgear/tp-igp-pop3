@@ -100,7 +100,7 @@ public class ClientConnection {
      * @throws IOException
      */
     public String waitForMailResponse() throws IOException, MalFormedMessageException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF8"));
         StringBuilder response = new StringBuilder();
         response.append(reader.readLine());
         MailMessage mailMess = new MailMessage(response.toString());

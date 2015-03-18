@@ -29,9 +29,8 @@ public class StateInit extends State {
      */
     public StateInit() {
         super();
-        this.setNextState(new StateAuth());
         String arpa = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(Calendar.getInstance().getTime());
-        System.out.println(arpa);
+        this.setNextState(new StateAuth(arpa));
         this.setMsgToSend(new ServerReadyMessage(Server.SERVER_NAME, arpa).toString());
     }
 
