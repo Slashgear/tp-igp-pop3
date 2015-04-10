@@ -24,6 +24,7 @@ public class ClientMailManager extends MailManager {
         super();
         try {
             path = "./";
+            
             initDirectory();
             initUser(login, "");
         } catch (MailManagerException e) {
