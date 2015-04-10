@@ -63,6 +63,7 @@ public class ClientMailManager extends MailManager {
     @Override
     public User initUser(String login, String password) {
         User user = new User(login, password, path);
+        
         //if you uncomment the line below, the program will search for the registered user's mails
         //user.initMails();
         users.add(user);
