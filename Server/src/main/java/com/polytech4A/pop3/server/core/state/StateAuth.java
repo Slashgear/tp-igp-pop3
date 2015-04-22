@@ -7,8 +7,8 @@ import com.polytech4A.pop3.messages.Exceptions.MalFormedMessageException;
 import com.polytech4A.pop3.messages.OkMessages.OkApopMessage;
 import com.polytech4A.pop3.server.core.Server;
 import com.polytech4a.smtp.mailmanager.FacadeServer;
-import com.polytech4a.smtp.mailmanager.exceptions.MailManagerException;
-import com.polytech4a.smtp.mailmanager.exceptions.UnknownUserException;
+
+
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -104,17 +104,17 @@ public class StateAuth extends State {
                 return invalidAuthProcessing(new PassMessage(user).toString());
             }
 
-        } catch (MailManagerException e) {
-            setNextState(new StateInit());
-            setMsgToSend(new QuitMessage().toString());
-            return false;
+
         } catch (MalFormedMessageException e) {
             setNextState(new StateInit());
             setMsgToSend(new QuitMessage().toString());
             return false;
-        } catch (UnknownUserException e) {
-            return invalidAuthProcessing(new NoMailBoxErr(user).toString());
+        } catch (com.polytech4a.smtp.mailmanager.exceptions.MailManagerException e) {
+            e.printStackTrace();
+        } catch (com.polytech4a.smtp.mailmanager.exceptions.UnknownUserException e) {
+            e.printStackTrace();
         }
+        return false;
     }
 
     /**

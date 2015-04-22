@@ -24,8 +24,8 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.polytech4A.pop3.mailmanager</groupId>
-            <artifactId>MailManager</artifactId>
+            <groupId>com.polytech4a.smtp</groupId>
+            <artifactId>mailmanager</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
