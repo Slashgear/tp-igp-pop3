@@ -1,6 +1,5 @@
 package com.polytech4A.pop3.server.core.state;
 
-import com.polytech4A.pop3.mailmanager.ServerMailManager;
 import com.polytech4A.pop3.server.core.Server;
 import org.apache.log4j.Logger;
 
@@ -71,6 +70,6 @@ public abstract class State {
      *
      * @param message String
      */
-    public abstract boolean analyze(String message, ServerMailManager manager);
+    public abstract boolean analyze(String message);
 
 }

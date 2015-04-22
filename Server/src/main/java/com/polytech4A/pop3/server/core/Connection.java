@@ -1,6 +1,5 @@
 package com.polytech4A.pop3.server.core;
 
-import com.polytech4A.pop3.mailmanager.ServerMailManager;
 import com.polytech4A.pop3.server.core.state.State;
 import com.polytech4A.pop3.server.core.state.StateInit;
 import org.apache.log4j.Logger;
@@ -43,11 +42,6 @@ public class Connection implements Runnable {
     private BufferedInputStream in;
 
     /**
-     * Mail manager for the server. Will handle interactions between server and files about client informations and mails.
-     */
-    private ServerMailManager manager;
-
-    /**
      * Constructor of the connection. It will be in initialization state. Initialize the two streams (output and input).
      */
     public Connection(Socket socket) {
@@ -56,7 +50,6 @@ public class Connection implements Runnable {
             this.state = new StateInit();
             this.out = new BufferedOutputStream(socket.getOutputStream());
             this.in = new BufferedInputStream(socket.getInputStream());
-            this.manager = new ServerMailManager(Server.SERVER_DIRECTORY);
         } catch (IOException e) {
             logger.error("Error while creating the connection.");
             logger.error(e.getMessage());
@@ -92,7 +85,7 @@ public class Connection implements Runnable {
                     message.append(((char) in.read()));
                 }
                 logger.info("Client : " + message);
-                runConnection = state.analyze(message.toString(), manager); //route the request to next state of the server
+                runConnection = state.analyze(message.toString()); //route the request to next state of the server
                 sendMessage();
                 updateState();
 

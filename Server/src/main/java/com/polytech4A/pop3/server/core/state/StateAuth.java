@@ -1,19 +1,17 @@
 package com.polytech4A.pop3.server.core.state;
 
-import com.polytech4A.pop3.mailmanager.Mail;
-import com.polytech4A.pop3.mailmanager.ServerMailManager;
-import com.polytech4A.pop3.mailmanager.User;
-import com.polytech4A.pop3.messages.ApopMessage;
-import com.polytech4A.pop3.messages.ErrMessages.AlreadyLockedErrMessage;
+import com.polytech4A.pop3.messages.*;
 import com.polytech4A.pop3.messages.ErrMessages.NoMailBoxErr;
 import com.polytech4A.pop3.messages.ErrMessages.PermissionDeniedErr;
 import com.polytech4A.pop3.messages.Exceptions.MalFormedMessageException;
-import com.polytech4A.pop3.messages.OkMessage;
 import com.polytech4A.pop3.messages.OkMessages.OkApopMessage;
-import com.polytech4A.pop3.messages.PassMessage;
-import com.polytech4A.pop3.messages.UserMessage;
 import com.polytech4A.pop3.server.core.Server;
+import com.polytech4a.smtp.mailmanager.FacadeServer;
+import com.polytech4a.smtp.mailmanager.exceptions.MailManagerException;
+import com.polytech4a.smtp.mailmanager.exceptions.UnknownUserException;
 import org.apache.log4j.Logger;
+
+import java.util.ArrayList;
 
 /**
  * Created by Adrien on 04/03/2015.
@@ -71,32 +69,20 @@ public class StateAuth extends State {
      * {@inheritDoc}
      */
     @Override
-    public boolean analyze(String message, ServerMailManager manager) {
+    public boolean analyze(String message) {
         try {
             if (ApopMessage.matches(message)) { //If APOP message received ...
                 ApopMessage apop = new ApopMessage(message);
                 user = apop.getId();
                 password = apop.getPassword();
-                if (manager.isUserExists(user, password)) {
-                    User usr = manager.initUser(user, password);
-                    if(!manager.isLockedUser(usr)) {
-                        usr.lockUser();
-                        setNextState(new StateTransaction(usr));
-                        int mailsSize = 0;
-                        for(Mail mail : usr.getMails()) {
-                            mailsSize += mail.getOutput().toString().length();
-                        }
-                        setMsgToSend(new OkApopMessage(user, usr.getMails().size(), mailsSize).toString());
-                        return true;
-                    } else {
-                        setNextState(new StateInit());
-                        setMsgToSend(new AlreadyLockedErrMessage().toString());
-                        return false;
-                    }
-
-                } else {
-                    return invalidAuthProcessing(new NoMailBoxErr(user).toString());
+                setNextState(new StateTransaction(user, password));
+                int mailsSize = 0;
+                ArrayList<String> mails = FacadeServer.getUserMails(user, password, Server.SERVER_DIRECTORY);
+                for (String mail : mails) {
+                    mailsSize += mail.length();
                 }
+                setMsgToSend(new OkApopMessage(user, mails.size(), mailsSize).toString());
+                return true;
             } else if (UserMessage.matches(message)) { //If User name message received ...
                 UserMessage usr = new UserMessage(message);
                 user = usr.getId();
@@ -106,30 +92,28 @@ public class StateAuth extends State {
             } else if (PassMessage.matches(message)) { //If Password message received ...
                 PassMessage pw = new PassMessage(message);
                 password = pw.getPassword();
-                if (manager.isUserExists(user, password)) {
-                    User usr = manager.initUser(user, password);
-                    if(usr != null) {
-                        setNextState(new StateTransaction(usr));
-                        int mailsSize = 0;
-                        for(Mail mail : usr.getMails()) {
-                            mailsSize += mail.getOutput().toString().length();
-                        }
-                        setMsgToSend(new OkApopMessage(user, usr.getMails().size(), mailsSize).toString());
-                        return true;
-                    } else {
-                        setNextState(new StateInit());
-                        setMsgToSend(new AlreadyLockedErrMessage().toString());
-                        return false;
-                    }
-                } else {
-                    return invalidAuthProcessing(new NoMailBoxErr(user).toString());
+                setNextState(new StateTransaction(user, password));
+                int mailsSize = 0;
+                ArrayList<String> mails = FacadeServer.getUserMails(user, password, Server.SERVER_DIRECTORY);
+                for (String mail : mails) {
+                    mailsSize += mail.length();
                 }
+                setMsgToSend(new OkApopMessage(user, mails.size(), mailsSize).toString());
+                return true;
             } else {
                 return invalidAuthProcessing(new PassMessage(user).toString());
             }
+
+        } catch (MailManagerException e) {
+            setNextState(new StateInit());
+            setMsgToSend(new QuitMessage().toString());
+            return false;
         } catch (MalFormedMessageException e) {
-            logger.error("Error during message creation. Malformed." + e.getMessage());
-            return invalidAuthProcessing(new PermissionDeniedErr().toString());
+            setNextState(new StateInit());
+            setMsgToSend(new QuitMessage().toString());
+            return false;
+        } catch (UnknownUserException e) {
+            return invalidAuthProcessing(new NoMailBoxErr(user).toString());
         }
     }
 

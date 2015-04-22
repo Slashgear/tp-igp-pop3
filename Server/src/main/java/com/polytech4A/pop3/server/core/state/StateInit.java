@@ -1,6 +1,5 @@
 package com.polytech4A.pop3.server.core.state;
 
-import com.polytech4A.pop3.mailmanager.ServerMailManager;
 import com.polytech4A.pop3.messages.OkMessages.ServerReadyMessage;
 import com.polytech4A.pop3.server.core.Server;
 
@@ -26,7 +25,7 @@ public class StateInit extends State {
      * {@inheritDoc}
      */
     @Override
-    public boolean analyze(String message, ServerMailManager manager) {
+    public boolean analyze(String message) {
         return true;
     }
 
