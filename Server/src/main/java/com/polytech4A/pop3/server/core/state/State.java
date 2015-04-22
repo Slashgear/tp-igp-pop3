@@ -1,6 +1,8 @@
 package com.polytech4A.pop3.server.core.state;
 
 import com.polytech4A.pop3.mailmanager.ServerMailManager;
+import com.polytech4A.pop3.server.core.Server;
+import org.apache.log4j.Logger;
 
 /**
  * Created by Adrien on 02/03/2015.
@@ -11,7 +13,6 @@ import com.polytech4A.pop3.mailmanager.ServerMailManager;
  *          State that describes the Server state.
  */
 public abstract class State {
-
 
     /**
      * Next state in which the object will be.

@@ -1,6 +1,9 @@
 package com.polytech4A.pop3.client.core.state;
 
 import com.polytech4A.pop3.messages.ApopMessage;
+import com.polytech4A.pop3.messages.ErrMessages.AlreadyLockedErrMessage;
+import com.polytech4A.pop3.messages.ErrMessages.NoMailBoxErr;
+import com.polytech4A.pop3.messages.ErrMessages.PermissionDeniedErr;
 import com.polytech4A.pop3.messages.OkMessages.OkApopMessage;
 
 /**
@@ -11,10 +14,15 @@ import com.polytech4A.pop3.messages.OkMessages.OkApopMessage;
  * State where we'll try to connect to the server with a mail address and a password
  */
 public class StateAuthentication extends State {
-    private int numberOfTries;
+    //private int numberOfTries;
+    private String errorReceived;
 
     public StateAuthentication(){
-        this.numberOfTries = 0;
+        this.errorReceived = null;
+    }
+
+    public String getErrorReceived() {
+        return errorReceived;
     }
 
     /**
@@ -27,15 +35,29 @@ public class StateAuthentication extends State {
         this.setMsgToSend(message.toString());
     }
 
-    public int getNumberOfTries(){
-        return this.numberOfTries;
-    }
-
     @Override
     public boolean analyze(String message) {
         Boolean response = false;
+
         response = OkApopMessage.matches(message);
-        return response;
+        if(response){
+            return response;
+        }
+        else{
+            /* Error management */
+            if(NoMailBoxErr.matches(message)){
+                this.errorReceived = "NoMailBoxErr";
+            }
+            if(PermissionDeniedErr.matches(message)){
+                this.errorReceived = "PermissionDeniedErr";
+                this.setNextState(null);
+            }
+            if(AlreadyLockedErrMessage.matches(message)){
+                this.errorReceived = "AlreadyLockedErrMessage";
+                this.setNextState(null);
+            }
+            return false;
+        }
     }
 
     @Override

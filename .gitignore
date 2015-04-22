@@ -8,6 +8,9 @@
 *.iml
 *.iws
 out
+Server_Log/
+Client_Log/
+mails/
 
 # Mac
 .DS_Store

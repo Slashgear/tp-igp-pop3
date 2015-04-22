@@ -39,23 +39,22 @@ public class ServerReadyMessage extends OkMessage {
         if (ServerReadyMessage.matches(text)) {
              array= text.split(" ");
             this.serverName =array[1];
-            construct(text.substring(text.indexOf(serverName + " ") + serverName.length()));
+            construct();
         } else {
             array= text.split(" ");
             this.serverName = array[0];
-            construct(text.substring(text.indexOf(" ")));
+            construct();
 
         }
     }
 
     /**
      * Procedure for the construction of the ServerReadyMessage.
-     * @param text
      */
-    private void construct(String text) {
+    private void construct() {
         this.message.append(" ");
         this.message.append(serverName);
-        this.message.append(text);
+        this.message.append(" POP3 server ready");
     }
 
     /**

@@ -1,5 +1,10 @@
 package com.polytech4A.pop3.client.core;
 
+import com.polytech4A.pop3.messages.Exceptions.MalFormedMessageException;
+import com.polytech4A.pop3.messages.MailMessage;
+import com.sun.xml.internal.ws.encoding.MtomCodec;
+import org.apache.log4j.Logger;
+
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -9,17 +14,19 @@ import java.util.TimerTask;
 /**
  * Connection class for the client
  */
-public class ClientConnection{
+public class ClientConnection {
+    private static Logger logger = Logger.getLogger(ClientMain.class);
+
     /**
      * Timeout in seconds
      */
     private static final int TIMEOUT = 5;
 
     private Socket socket;
-    private BufferedOutputStream bufferedOutputStream;
-    private BufferedInputStream bufferedInputStream;
+    private BufferedOutputStream out;
+    private BufferedInputStream in;
 
-    public ClientConnection(){
+    public ClientConnection() {
     }
 
     public ClientConnection(InetAddress address, int port) throws IOException {
@@ -30,43 +37,32 @@ public class ClientConnection{
         return socket;
     }
 
-    public BufferedOutputStream getBufferedOutputStream() {
-        return bufferedOutputStream;
+    public BufferedOutputStream getOut() {
+        return out;
     }
 
-    public BufferedInputStream getBufferedInputStream() {
-        return bufferedInputStream;
+    public BufferedInputStream getIn() {
+        return in;
     }
 
     /**
      * Initialise the connection with the server and different objects with it, like the input and output streams
      *
-     * @param port      Port of the server to reach
-     * @param address   IP Address of the server to reach
+     * @param port    Port of the server to reach
+     * @param address IP Address of the server to reach
      */
     private void createConnection(InetAddress address, int port) throws IOException {
-        try {
-            this.socket = new Socket(address, port);
-            InputStream inputStream = this.getSocket().getInputStream();
-            OutputStream outputStream = this.getSocket().getOutputStream();
-
-            this.bufferedOutputStream = new BufferedOutputStream(outputStream);
-            this.bufferedInputStream = new BufferedInputStream(inputStream);
-
-        } catch (IOException e) {
-            throw e;
-        }
+        this.socket = new Socket(address, port);
+        this.socket.setSoTimeout(this.TIMEOUT * 1000);
+        this.out = new BufferedOutputStream(this.getSocket().getOutputStream());
+        this.in = new BufferedInputStream(this.getSocket().getInputStream());
     }
 
     /**
      * End the connection with the server by closing the socket
      */
     public void closeConnection() throws IOException {
-        try {
-            this.socket.close();
-        } catch (IOException e) {
-            throw e;
-        }
+        this.socket.close();
     }
 
 
@@ -74,49 +70,40 @@ public class ClientConnection{
      * Send the message to the server through the created streams
      */
     public void sendMessage(String message) throws IOException {
-        try {
-            this.bufferedOutputStream.write(message.getBytes());
-            this.bufferedOutputStream.flush();
-        } catch (IOException e) {
-            throw e;
-        }
+        logger.info("Client : " + message);
+        this.out.write(message.getBytes());
+        this.out.flush();
     }
 
     /**
      * Wait for the response from the server and send back the response with a string format
      */
-    public String waitForResponse() throws Exception {
+    public String waitForResponse() throws IOException {
         StringBuilder response = new StringBuilder();
-        BufferedInputStream bi = this.bufferedInputStream;
-
-        try {
-            /* We are going to wait until the response arrived or the timeout expired*/
-            final Boolean[] expired = {false};
-
-            Timer timer = new Timer();
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    expired[0] = true;
-                }
-            }, this.TIMEOUT * 1000);
-
-
-            while (bi.available()==0 || !expired[0]){
-
-            }
-
-            while (bi.available() != 0) {
-                response.append((char) bi.read());
-            }
-
-            if(expired[0]){
-                throw new Exception("Connexion expired");
-            }
-        } catch (IOException e) {
-            throw e;
+        response.append(((char) in.read()));
+        while (in.available() != 0) {
+            response.append(((char) in.read()));
         }
-
+        logger.info("Server : " + response.toString());
         return response.toString();
+    }
+
+    /**
+     * Wait for the response containing a mail from the server and send back the response with a string format.
+     *
+     * @return Response to send, in a String.
+     * @throws IOException
+     */
+    public String waitForMailResponse() throws IOException, MalFormedMessageException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+        StringBuilder response = new StringBuilder();
+        response.append(reader.readLine());
+        MailMessage mailMess = new MailMessage(response.toString());
+        char[] buf = new char[mailMess.getSize()];
+        reader.read(buf, 0, mailMess.getSize());
+        response.append(buf);
+        logger.info("Server : " + response.toString());
+        return response.toString();
+
     }
 }

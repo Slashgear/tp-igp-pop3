@@ -1,4 +1,6 @@
-package com.polytech4A.pop3.mailmanager;
+package com.polytech4a.smtp.mailmanager.user;
+
+import com.polytech4a.smtp.mailmanager.exceptions.MailManagerException;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,8 +9,8 @@ import java.io.IOException;
  * Created by Dimitri on 09/03/2015.
  */
 public class UserServer extends User {
-    public UserServer(String login, String password, String path){
-        super(login,password,path);
+    public UserServer(String login, String password, String path) throws MailManagerException {
+        super(login, password, path);
     }
 
     /**

@@ -1,4 +1,4 @@
-package com.polytech4A.pop3.mailmanager.Exceptions;
+package com.polytech4a.smtp.mailmanager.exceptions;
 
 /**
  * Created by Dimitri on 04/03/2015.

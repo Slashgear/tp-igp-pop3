@@ -24,7 +24,7 @@ public class Server {
     /**
      * Path to server directory.
      */
-    public static String SERVER_DIRECTORY = "Server/";
+    public static String SERVER_DIRECTORY = "./";
 
     /**
      * Server name to send to client.
@@ -70,7 +70,7 @@ public class Server {
     private void start(int port, int nbConnections) {
         try {
             this.socket = new ServerSocket(port, nbConnections);
-            logger.info("Starting serveur on port " + port + ".");
+            logger.info("Starting server on port " + port + ".");
         } catch (IOException e) {
             logger.error("Impossible to start server, port may " + port + " be busy");
             logger.error(e.getMessage());
@@ -101,8 +101,8 @@ public class Server {
      * Starts the server process and open a connection when socket accepts a connection.
      */
     public void listen() {
-        //TODO : Handle a better exit condition.
         boolean listening = true;
+        logger.info("LISTENING... ...");
         while (listening) {
             try {
                 this.openConnection(this.socket.accept());

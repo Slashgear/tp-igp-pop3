@@ -4,9 +4,16 @@ import com.polytech4A.pop3.mailmanager.Mail;
 import com.polytech4A.pop3.mailmanager.ServerMailManager;
 import com.polytech4A.pop3.mailmanager.User;
 import com.polytech4A.pop3.messages.ApopMessage;
+import com.polytech4A.pop3.messages.ErrMessages.AlreadyLockedErrMessage;
+import com.polytech4A.pop3.messages.ErrMessages.NoMailBoxErr;
+import com.polytech4A.pop3.messages.ErrMessages.PermissionDeniedErr;
 import com.polytech4A.pop3.messages.Exceptions.MalFormedMessageException;
+import com.polytech4A.pop3.messages.OkMessage;
+import com.polytech4A.pop3.messages.OkMessages.OkApopMessage;
 import com.polytech4A.pop3.messages.PassMessage;
 import com.polytech4A.pop3.messages.UserMessage;
+import com.polytech4A.pop3.server.core.Server;
+import org.apache.log4j.Logger;
 
 /**
  * Created by Adrien on 04/03/2015.
@@ -17,6 +24,11 @@ import com.polytech4A.pop3.messages.UserMessage;
  *          State of the server in which it is waiting for the client to provide authorization informations.
  */
 public class StateAuth extends State {
+    /**
+     * Logger of the server.
+     */
+    private static Logger logger = Logger.getLogger(Server.class);
+
     /**
      * Number of times that the client tries to log in the server.
      */
@@ -61,40 +73,63 @@ public class StateAuth extends State {
     @Override
     public boolean analyze(String message, ServerMailManager manager) {
         try {
-            if (ApopMessage.matches(message)) {
+            if (ApopMessage.matches(message)) { //If APOP message received ...
                 ApopMessage apop = new ApopMessage(message);
                 user = apop.getId();
                 password = apop.getPassword();
                 if (manager.isUserExists(user, password)) {
                     User usr = manager.initUser(user, password);
-                    setNextState(new StateTransaction());
-                    buildSuccessLoginMessage(usr);
-                    return true;
+                    if(!manager.isLockedUser(usr)) {
+                        usr.lockUser();
+                        setNextState(new StateTransaction(usr));
+                        int mailsSize = 0;
+                        for(Mail mail : usr.getMails()) {
+                            mailsSize += mail.getOutput().toString().length();
+                        }
+                        setMsgToSend(new OkApopMessage(user, usr.getMails().size(), mailsSize).toString());
+                        return true;
+                    } else {
+                        setNextState(new StateInit());
+                        setMsgToSend(new AlreadyLockedErrMessage().toString());
+                        return false;
+                    }
+
                 } else {
-                    return invalidAuthProcessing();
+                    return invalidAuthProcessing(new NoMailBoxErr(user).toString());
                 }
-            } else if (UserMessage.matches(message)) {
+            } else if (UserMessage.matches(message)) { //If User name message received ...
                 UserMessage usr = new UserMessage(message);
                 user = usr.getId();
                 setNextState(new StateAuth(nbTry));
-                setMsgToSend(null);
+                setMsgToSend(new OkMessage().toString());
                 return true;
-            } else if (PassMessage.matches(message)) {
+            } else if (PassMessage.matches(message)) { //If Password message received ...
                 PassMessage pw = new PassMessage(message);
                 password = pw.getPassword();
                 if (manager.isUserExists(user, password)) {
                     User usr = manager.initUser(user, password);
-                    setNextState(new StateTransaction());
-                    buildSuccessLoginMessage(usr);
-                    return true;
+                    if(usr != null) {
+                        setNextState(new StateTransaction(usr));
+                        int mailsSize = 0;
+                        for(Mail mail : usr.getMails()) {
+                            mailsSize += mail.getOutput().toString().length();
+                        }
+                        setMsgToSend(new OkApopMessage(user, usr.getMails().size(), mailsSize).toString());
+                        return true;
+                    } else {
+                        setNextState(new StateInit());
+                        setMsgToSend(new AlreadyLockedErrMessage().toString());
+                        return false;
+                    }
                 } else {
-                    return invalidAuthProcessing();
+                    return invalidAuthProcessing(new NoMailBoxErr(user).toString());
                 }
             } else {
-                return invalidAuthProcessing();
+                return invalidAuthProcessing(new PassMessage(user).toString());
             }
         } catch (MalFormedMessageException e) {
-            return invalidAuthProcessing();
+            logger.error("Error during message creation. Malformed." + e.getMessage());
+            return invalidAuthProcessing(new PermissionDeniedErr().toString());
         }
     }
 
@@ -104,31 +139,17 @@ public class StateAuth extends State {
      * @return False when the number of tryings are greater than the max number of tryings.
      * True if the connection still runs.
      */
-    private boolean invalidAuthProcessing() {
+    private boolean invalidAuthProcessing(String message) {
         nbTry++;
-        setMsgToSend("-ERR permission denied");
         if (nbTry >= MAX_TRY) {
             setNextState(new StateInit());
+            setMsgToSend(new PermissionDeniedErr().toString());
             return false;
         } else {
-            setNextState(new StateTransaction());
+            setNextState(new StateAuth(nbTry));
+            setMsgToSend(message);
             return true;
         }
-    }
-
-    private void buildSuccessLoginMessage(User user) {
-        int mailsSize = 0;
-        for(Mail mail : user.getMails()) {
-            mailsSize += mail.getOutput().toString().length();
-        }
-        StringBuffer buf = new StringBuffer("+OK ");
-        buf.append(user);
-        buf.append("'s maildrop has ");
-        buf.append(user.getMails().size());
-        buf.append(" messages (");
-        buf.append(mailsSize);
-        buf.append(")");
-        setMsgToSend(buf.toString());
     }
 
 }
